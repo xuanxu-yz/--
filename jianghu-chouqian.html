@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>江湖签 · 金庸群侠抽签</title>
+<meta name="description" content="黑白水墨风格的本地抽签网站，抽取金庸武侠世界中的江湖角色。" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tdesign-vue-next@1.20.7/dist/tdesign.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tdesign-vue-next@1.20.7/dist/tdesign.min.js"></script>
+<style>
+/* =========================================================
+   一、设计令牌：宣纸 + 焦墨 + 一点朱砂
+   （若要绝对纯粹的黑白，把 --seal 改成 --ink-700 即可）
+   ========================================================= */
+:root{
+  --ink-900:#0d0d0c; --ink-800:#1b1b19; --ink-700:#2a2a27; --ink-600:#3c3c38;
+  --ink-500:#57574f; --ink-400:#78786f; --ink-300:#9c9c92; --ink-200:#c4c2b8;
+  --ink-100:#dedbd1;
+  --paper-0:#fdfcf8; --paper-1:#faf8f2; --paper-2:#f3f0e8; --paper-3:#e9e5db; --paper-4:#dcd7ca;
+  --line:#dfdad0; --line-2:#c9c3b6;
+  --seal:#8f3a32;
+  --serif:"Songti SC","STSong","Source Han Serif SC","Noto Serif SC","SimSun",Georgia,serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --sh-1:0 1px 2px rgba(34,32,26,.05), 0 10px 26px -18px rgba(34,32,26,.45);
+  --sh-2:0 26px 60px -34px rgba(20,18,14,.65);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+/* TDesign 主题对齐水墨：品牌色归墨，圆角归零 */
+:root{
+  --td-brand-color-1:#f3f0e8; --td-brand-color-2:#e9e5db; --td-brand-color-3:#dedad0;
+  --td-brand-color-4:#c4c2b8; --td-brand-color-5:#78786f; --td-brand-color-6:#57574f;
+  --td-brand-color-7:#3c3c38; --td-brand-color-8:#2a2a27; --td-brand-color-9:#1b1b19;
+  --td-brand-color-10:#0d0d0c;
+  --td-brand-color:#1b1b19;
+  --td-brand-color-hover:#333330;
+  --td-brand-color-active:#000;
+  --td-brand-color-focus:#e9e5db;
+  --td-brand-color-disabled:#c4c2b8;
+  --td-brand-color-light:#f3f0e8;
+  --td-brand-color-light-hover:#e9e5db;
+  --td-error-color:#8f3a32; --td-error-color-hover:#a34a41;
+  --td-text-color-primary:#1b1b19; --td-text-color-secondary:#57574f;
+  --td-text-color-placeholder:#9c9c92; --td-text-color-disabled:#c4c2b8;
+  --td-bg-color-container:#fdfcf8; --td-bg-color-container-hover:#f3f0e8;
+  --td-border-level-1-color:#dfdad0; --td-border-level-2-color:#c9c3b6;
+  --td-radius-default:2px; --td-radius-medium:2px; --td-radius-large:2px;
+  --td-font-family:var(--sans);
+  --td-shadow-1:var(--sh-1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+[v-cloak]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{
+  min-height:100vh;
+  font-family:var(--sans);
+  color:var(--ink-800);
+  background:
+    radial-gradient(120% 80% at 50% -20%, #ffffff 0%, var(--paper-1) 42%, var(--paper-2) 100%);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+button,input{font-family:inherit}
+::selection{background:rgba(27,27,25,.9);color:var(--paper-1)}
+
+/* =========================================================
+   二、背景层：宣纸颗粒 + 墨晕 + 两丛墨竹
+   ========================================================= */
+.grain{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.38'/%3E%3C/svg%3E");
+}
+.blot{position:fixed;z-index:0;pointer-events:none;border-radius:50%;filter:blur(70px)}
+.blot-a{width:46vw;height:46vw;left:-14vw;top:-10vw;background:radial-gradient(circle,rgba(20,20,18,.10),transparent 68%)}
+.blot-b{width:40vw;height:40vw;right:-10vw;bottom:-14vw;background:radial-gradient(circle,rgba(20,20,18,.09),transparent 70%)}
+.blot-c{width:30vw;height:30vw;left:44%;top:34%;background:radial-gradient(circle,rgba(20,20,18,.055),transparent 70%)}
+
+.bamboo{
+  position:fixed;top:0;bottom:0;width:min(21vw,280px);z-index:0;
+  pointer-events:none;opacity:.17;
+}
+.bamboo-l{left:0}
+.bamboo-r{right:0;transform:scaleX(-1)}
+.bamboo svg{display:block;width:100%;height:100%}
+
+/* =========================================================
+   三、骨架
+   ========================================================= */
+.page{
+  position:relative;z-index:1;
+  max-width:1420px;margin:0 auto;
+  padding:22px 24px 34px;
+  display:grid;
+  grid-template-columns:322px minmax(0,1fr) 306px;
+  gap:18px;
+  align-items:start;
+}
+
+/* ---------------- 抬头 ---------------- */
+.masthead{
+  grid-column:1 / -1;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  padding:2px 2px 16px;
+  position:relative;
+}
+.masthead::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--ink-300) 12%,var(--ink-600) 50%,var(--ink-300) 88%,transparent);
+  opacity:.6;
+}
+.brand{display:flex;align-items:center;gap:16px;min-width:0}
+.seal-badge{
+  width:50px;height:50px;flex:none;display:grid;place-items:center;
+  border:2px solid var(--seal);border-radius:3px;
+  color:var(--seal);font-family:var(--serif);font-size:25px;font-weight:700;line-height:1;
+  background:rgba(143,58,50,.07);
+  transform:rotate(-4deg);
+  box-shadow:inset 0 0 0 3px rgba(253,252,248,.7);
+}
+.brand-txt{display:flex;flex-direction:column;gap:5px;min-width:0}
+.brand-txt h1{
+  font-family:var(--serif);font-size:30px;font-weight:700;
+  letter-spacing:.3em;color:var(--ink-900);line-height:1.1;
+  white-space:nowrap;
+}
+.brand-txt p{
+  font-size:10.5px;letter-spacing:.34em;color:var(--ink-400);
+  text-transform:uppercase;white-space:nowrap;
+}
+.masthead-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:flex-end}
+.poem{
+  font-family:var(--serif);font-size:12.5px;letter-spacing:.16em;color:var(--ink-400);
+  text-align:right;line-height:2;
+}
+.poem b{font-weight:400;color:var(--ink-600)}
+.poem .poem-by{
+  display:inline-block;margin-top:2px;
+  font-family:var(--sans);font-size:10.5px;letter-spacing:.18em;color:var(--ink-300);
+}
+
+/* ---------------- 面板 ---------------- */
+.panel{
+  position:relative;
+  background:var(--paper-0);
+  border:1px solid var(--line-2);
+  border-radius:3px;
+  box-shadow:var(--sh-1);
+  padding:18px;
+}
+.panel::after{
+  content:"";position:absolute;inset:5px;border:1px solid rgba(70,66,56,.09);
+  border-radius:2px;pointer-events:none;
+}
+.panel-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  font-family:var(--serif);font-size:13.5px;letter-spacing:.34em;color:var(--ink-700);
+}
+.panel-head::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,rgba(120,116,105,.5),transparent);
+}
+.panel-head .ph-num{font-size:11px;color:var(--ink-300);letter-spacing:.1em}
+
+/* =========================================================
+   四、签筒
+   ========================================================= */
+.tube-wrap{position:relative;padding:6px 0 4px;outline:none}
+.tube-wrap.clickable{cursor:pointer}
+.tube-wrap.clickable:hover .tube-svg{filter:drop-shadow(0 6px 14px rgba(20,18,14,.12))}
+.tube-wrap.clickable:active .tube-svg{transform:scale(.985);transition:transform .12s var(--ease)}
+.tube-wrap.clickable:focus-visible .tube-svg{outline:2px dashed var(--ink-400);outline-offset:4px}
+.tube-svg{display:block;width:100%;height:auto;max-height:340px;margin:0 auto;transition:filter .25s var(--ease),transform .12s var(--ease)}
+
+.tube-shaker{transform-origin:50% 88%;transform-box:fill-box}
+.tube-shaker.shaking{animation:tubeShake .85s cubic-bezier(.36,.07,.19,.97)}
+@keyframes tubeShake{
+  0%,100%{transform:rotate(0) translateY(0)}
+  8%{transform:rotate(-4.2deg) translateY(-3px)}
+  20%{transform:rotate(3.6deg) translateY(2px)}
+  32%{transform:rotate(-3.2deg) translateY(-2px)}
+  46%{transform:rotate(2.6deg) translateY(2px)}
+  60%{transform:rotate(-2deg)}
+  76%{transform:rotate(1.4deg)}
+  90%{transform:rotate(-.6deg)}
+}
+.stick-inner{
+  transform-box:fill-box;transform-origin:50% 100%;
+  transition:transform .52s cubic-bezier(.22,.9,.24,1);
+  will-change:transform;
+}
+.sticks.rattling .stick-inner{animation:stickRattle .26s ease-in-out infinite}
+@keyframes stickRattle{
+  0%,100%{transform:translateY(0) rotate(0)}
+  25%{transform:translateY(-5px) rotate(-2.6deg)}
+  50%{transform:translateY(4px) rotate(2.2deg)}
+  75%{transform:translateY(-3px) rotate(-1.4deg)}
+}
+.stick-inner.picked{
+  animation:none !important;
+  transform:translateY(-64px) rotate(-4.5deg);
+}
+.stick-inner.picked .stick-body{stroke:#8f3a32;stroke-width:.9}
+
+.tube-shadow{opacity:.75}
+
+/* 摇签按钮 */
+.draw-btn{margin-top:16px}
+.draw-btn .t-button{
+  height:52px;width:100%;
+  font-family:var(--serif);font-size:16.5px;font-weight:600;
+  letter-spacing:.52em;text-indent:.52em;
+  background:var(--ink-900);border:none;color:#f7f5ef;
+  border-radius:2px;
+  box-shadow:0 12px 26px -18px rgba(0,0,0,.85);
+  transition:background .22s var(--ease),box-shadow .22s var(--ease),transform .12s var(--ease);
+}
+.draw-btn .t-button:hover:not(.t-is-disabled):not(.t-is-loading){
+  background:var(--ink-700);
+  box-shadow:0 16px 32px -18px rgba(0,0,0,.9);
+}
+.draw-btn .t-button:active:not(.t-is-disabled){transform:translateY(1px)}
+.hint-key{
+  margin-top:9px;text-align:center;font-size:11px;letter-spacing:.16em;color:var(--ink-300);
+}
+.hint-key kbd{
+  font-family:var(--sans);font-size:10px;border:1px solid var(--line-2);
+  border-bottom-width:2px;border-radius:3px;padding:1px 5px;color:var(--ink-500);background:var(--paper-1);
+}
+
+/* 控制行 */
+.ctrl{margin-top:16px;border-top:1px dashed var(--line);padding-top:6px}
+.ctrl-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 2px;border-bottom:1px dashed rgba(120,116,105,.22);
+}
+.ctrl-row:last-child{border-bottom:none}
+.ctrl-row .lab{
+  font-family:var(--serif);font-size:12.5px;letter-spacing:.2em;color:var(--ink-600);
+  display:flex;align-items:center;gap:7px;
+}
+.ctrl-row .lab .tip{font-family:var(--sans);font-size:10.5px;letter-spacing:0;color:var(--ink-300)}
+.ctrl-row .t-select{width:152px}
+.remain{
+  margin-top:12px;display:flex;justify-content:space-between;
+  font-size:11.5px;letter-spacing:.1em;color:var(--ink-400);
+}
+.remain b{font-family:var(--serif);font-size:14px;color:var(--ink-800);font-weight:600}
+
+/* =========================================================
+   五、签纸
+   ========================================================= */
+.sign-paper{
+  position:relative;min-height:588px;padding:36px 44px 30px;
+  display:flex;flex-direction:column;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0) 40%),
+    radial-gradient(110% 75% at 50% -12%,#fffefb,var(--paper-1) 55%,var(--paper-3) 100%);
+  border:1px solid var(--line-2);
+  box-shadow:var(--sh-2),inset 0 0 60px rgba(150,142,124,.13);
+  overflow:hidden;
+}
+.sign-paper::before{
+  content:"";position:absolute;inset:11px;border:1px solid rgba(60,58,50,.16);pointer-events:none;
+}
+.sign-paper::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23m)' opacity='0.28'/%3E%3C/svg%3E");
+}
+.sign-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column}
+
+/* 空签状态 */
+.sign-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+  min-height:470px;
+}
+.vm{
+  writing-mode:vertical-rl;font-family:var(--serif);font-size:34px;
+  letter-spacing:.46em;color:var(--ink-200);line-height:1;
+  text-shadow:0 1px 0 rgba(255,255,255,.8);
+}
+.sign-empty .sub{
+  font-size:12.5px;letter-spacing:.3em;color:var(--ink-300);text-align:center;line-height:2.2;
+}
+.sign-empty .sub em{font-style:normal;color:var(--ink-400)}
+
+/* 签纸内容 */
+@keyframes riseIn{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:none}
+}
+@keyframes inkSpread{
+  from{opacity:0;transform:scale(.35)}
+  to{opacity:1;transform:scale(1)}
+}
+.sign-body .anim{animation:riseIn .6s var(--ease) both}
+.sign-body .anim:nth-child(1){animation-delay:.02s}
+.sign-body .anim:nth-child(2){animation-delay:.12s}
+.sign-body .anim:nth-child(3){animation-delay:.22s}
+.sign-body .anim:nth-child(4){animation-delay:.32s}
+.sign-body .anim:nth-child(5){animation-delay:.4s}
+
+.sign-head{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-bottom:14px;
+}
+.sign-no{
+  font-family:var(--serif);font-size:13px;letter-spacing:.3em;color:var(--ink-400);
+}
+.tier-chip{display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:5px}
+.dots i{
+  width:8px;height:8px;border-radius:50%;
+  border:1px solid var(--ink-400);background:transparent;display:block;
+  transition:background .25s var(--ease),border-color .25s var(--ease),transform .25s var(--ease);
+}
+.dots i.on{transform:scale(1.05)}
+/* 5 等签运色彩：天机=朱砂,上上=浓墨,上吉=中墨,中吉=淡墨,平签=极淡灰 */
+.tier-chip.t5 .dots i.on{background:#8F3A32;border-color:#8F3A32}
+.tier-chip.t5 .tier-name{color:#8F3A32}
+.tier-chip.t4 .dots i.on{background:var(--ink-900);border-color:var(--ink-900)}
+.tier-chip.t4 .tier-name{color:var(--ink-900)}
+.tier-chip.t3 .dots i.on{background:var(--ink-700);border-color:var(--ink-700)}
+.tier-chip.t3 .tier-name{color:var(--ink-700)}
+.tier-chip.t2 .dots i.on{background:var(--ink-500);border-color:var(--ink-500)}
+.tier-chip.t2 .tier-name{color:var(--ink-500)}
+.tier-chip.t1 .dots i.on{background:var(--ink-300);border-color:var(--ink-400)}
+.tier-chip.t1 .tier-name{color:var(--ink-400)}
+.tier-name{font-family:var(--serif);font-size:12.5px;letter-spacing:.2em;color:var(--ink-600)}
+.tier-label{font-size:11px;letter-spacing:.1em;color:var(--ink-300)}
+
+.hero{position:relative;padding:18px 0 22px}
+.hero::before{
+  content:"";position:absolute;left:-6%;top:-8%;width:62%;height:150%;
+  background:radial-gradient(48% 50% at 34% 46%,rgba(18,18,16,.11),rgba(18,18,16,.05) 46%,transparent 72%);
+  filter:blur(6px);border-radius:50%;
+  animation:inkSpread .9s var(--ease) both;
+  pointer-events:none;
+}
+.hero-name{
+  position:relative;
+  font-family:var(--serif);font-weight:700;color:var(--ink-900);
+  font-size:clamp(40px,5.4vw,62px);line-height:1.1;letter-spacing:.14em;
+}
+.hero-role{
+  position:relative;margin-top:12px;
+  font-size:12.5px;letter-spacing:.2em;color:var(--ink-400);
+}
+.hero-quote{
+  position:relative;margin-top:26px;padding-left:20px;
+  font-family:var(--serif);font-size:clamp(18px,2vw,22px);line-height:2;
+  color:var(--ink-700);letter-spacing:.06em;
+  border-left:2px solid var(--ink-800);
+}
+.hero-quote::before,.hero-quote::after{color:var(--ink-300)}
+
+.meta{margin-top:auto;border-top:1px dashed var(--line);padding-top:6px}
+.meta-row{
+  display:flex;gap:18px;align-items:baseline;
+  padding:9px 2px;border-bottom:1px dashed rgba(120,116,105,.2);
+}
+.meta-row:last-child{border-bottom:none}
+.meta-row .k{
+  flex:none;width:52px;font-family:var(--serif);font-size:11.5px;
+  letter-spacing:.24em;color:var(--ink-300);
+}
+.meta-row .v{font-family:var(--serif);font-size:14.5px;letter-spacing:.06em;color:var(--ink-700)}
+
+.sign-foot{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  margin-top:14px;
+}
+.sign-foot .stamp{
+  font-size:11px;letter-spacing:.18em;color:var(--ink-300);line-height:2;
+}
+.seal-mark{
+  flex:none;width:46px;height:46px;display:grid;place-items:center;
+  border:2px solid var(--seal);border-radius:3px;color:var(--seal);
+  font-family:var(--serif);font-size:23px;font-weight:700;
+  background:rgba(143,58,50,.06);
+  transform:rotate(-6deg);
+  box-shadow:inset 0 0 0 2px rgba(253,252,248,.72);
+  animation:sealDown .5s var(--ease) .55s both;
+}
+@keyframes sealDown{
+  from{opacity:0;transform:rotate(-16deg) scale(1.5)}
+  to{opacity:1;transform:rotate(-6deg) scale(1)}
+}
+
+/* =========================================================
+   六、签录
+   ========================================================= */
+.progress-wrap{margin-bottom:14px}
+.progress-line{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  font-size:11.5px;letter-spacing:.12em;color:var(--ink-400);margin-bottom:8px;
+}
+.progress-line b{font-family:var(--serif);font-size:19px;color:var(--ink-900);font-weight:600;line-height:1}
+.progress-wrap .t-progress{margin:0}
+.progress-wrap .t-progress__bar{background:var(--paper-3)}
+.progress-wrap .t-progress__inner{background:linear-gradient(90deg,var(--ink-800),var(--ink-500))}
+
+.tier-stats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tier-stat{
+  flex:1 1 auto;min-width:0;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:7px 4px;border:1px solid var(--line);border-radius:2px;background:var(--paper-1);
+  position:relative;overflow:hidden;
+}
+.tier-stat::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:transparent;
+}
+.tier-stat.ts-5::before{background:#8F3A32}
+.tier-stat.ts-4::before{background:var(--ink-900)}
+.tier-stat.ts-3::before{background:var(--ink-700)}
+.tier-stat.ts-2::before{background:var(--ink-500)}
+.tier-stat.ts-1::before{background:var(--ink-300)}
+.tier-stat .ts-name{font-family:var(--serif);font-size:10.5px;letter-spacing:.08em;color:var(--ink-400);white-space:nowrap}
+.tier-stat .ts-num{font-family:var(--serif);font-size:14px;color:var(--ink-800)}
+.tier-stat .ts-bar{width:100%;height:3px;background:var(--paper-4);position:relative;overflow:hidden}
+.tier-stat .ts-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink-700);transition:width .5s var(--ease)}
+.tier-stat.ts-5 .ts-bar i{background:#8F3A32}
+.tier-stat.ts-4 .ts-bar i{background:var(--ink-900)}
+.tier-stat.ts-3 .ts-bar i{background:var(--ink-700)}
+
+.log-list{
+  max-height:352px;overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;gap:6px;padding-right:4px;
+}
+.log-list::-webkit-scrollbar{width:6px}
+.log-list::-webkit-scrollbar-thumb{background:var(--ink-200);border-radius:3px}
+.log-list::-webkit-scrollbar-track{background:transparent}
+
+.log-item{
+  position:relative;display:flex;align-items:center;gap:11px;
+  padding:9px 10px;border:1px solid transparent;border-bottom-color:rgba(120,116,105,.18);
+  cursor:pointer;transition:background .18s var(--ease),border-color .18s var(--ease);
+  animation:riseIn .4s var(--ease) both;
+}
+.log-item:hover{background:var(--paper-2);border-color:var(--line)}
+.log-idx{
+  flex:none;width:22px;height:22px;display:grid;place-items:center;
+  font-family:var(--serif);font-size:11px;color:var(--ink-400);
+  border:1px solid var(--line);border-radius:2px;background:var(--paper-1);
+}
+.log-main{flex:1;min-width:0}
+.log-name{
+  font-family:var(--serif);font-size:15px;letter-spacing:.1em;color:var(--ink-800);
+  display:flex;align-items:center;gap:8px;
+}
+.log-tier{font-size:10px;letter-spacing:.08em;color:var(--ink-300);font-family:var(--sans);transition:color .25s var(--ease)}
+.log-tier.t5{color:#8F3A32}
+.log-tier.t4{color:var(--ink-900)}
+.log-tier.t3{color:var(--ink-700)}
+.log-tier.t2{color:var(--ink-500)}
+.log-tier.t1{color:var(--ink-400)}
+.log-item.lt-5{box-shadow:inset 3px 0 0 #8F3A32}
+.log-item.lt-4{box-shadow:inset 3px 0 0 var(--ink-900)}
+.log-item.lt-3{box-shadow:inset 3px 0 0 var(--ink-700)}
+.log-item.lt-2{box-shadow:inset 3px 0 0 var(--ink-500)}
+.log-item.lt-1{box-shadow:inset 3px 0 0 var(--ink-300)}
+.log-sub{
+  margin-top:3px;font-size:10.5px;color:var(--ink-300);letter-spacing:.06em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.log-del{
+  flex:none;opacity:0;transition:opacity .16s var(--ease);
+}
+.log-item:hover .log-del{opacity:1}
+.log-empty{
+  padding:34px 10px;text-align:center;
+  font-family:var(--serif);font-size:12.5px;letter-spacing:.22em;color:var(--ink-300);line-height:2.4;
+}
+.log-foot{margin-top:12px;display:flex;gap:6px}
+.log-foot .t-button{flex:1;font-size:11.5px;padding:0 6px;min-width:0}
+
+.streak{
+  display:flex;gap:10px;margin:4px 0 12px;
+  padding:9px 10px;border:1px solid var(--line);border-radius:2px;
+  background:var(--paper-1);
+}
+.streak-item{flex:1;display:flex;flex-direction:column;gap:2px;align-items:center}
+.streak-k{font-family:var(--serif);font-size:10.5px;letter-spacing:.18em;color:var(--ink-400)}
+.streak-v{font-family:var(--serif);font-size:15px;color:var(--ink-800);font-weight:600;line-height:1}
+.streak-v.tier-chip{display:inline-flex;gap:5px}
+.streak-v.tier-chip .tier-name{font-size:11px;letter-spacing:.1em}
+
+/* =========================================================
+   七、TDesign 细节覆写
+   ========================================================= */
+.t-button{border-radius:2px;font-family:var(--sans)}
+.t-button--variant-outline{border-color:var(--line-2);color:var(--ink-600);background:transparent}
+.t-button--variant-outline:hover{border-color:var(--ink-600);color:var(--ink-900);background:var(--paper-2)}
+.t-button--variant-text{color:var(--ink-400)}
+.t-button--variant-text:hover{color:var(--ink-900);background:var(--paper-2)}
+.t-switch.t-is-checked{background:var(--ink-800);border-color:var(--ink-800)}
+.t-switch{border-radius:10px}
+.t-select .t-input{border-radius:2px;background:var(--paper-1)}
+.t-select .t-input:hover{border-color:var(--ink-400)}
+.t-dialog{border-radius:3px;border:1px solid var(--line-2);box-shadow:var(--sh-2);background:var(--paper-0)}
+.t-dialog__header{font-family:var(--serif);letter-spacing:.24em;font-size:15px}
+.t-dialog__footer .t-button{min-width:92px}
+.t-message{border-radius:2px}
+.t-tag{border-radius:2px}
+.t-progress__bar{border-radius:0}
+
+/* 签文详情弹窗 */
+.dlg-body{padding:4px 2px 2px}
+.dlg-hero{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px dashed var(--line)}
+.dlg-name{font-family:var(--serif);font-size:38px;font-weight:700;letter-spacing:.12em;color:var(--ink-900);line-height:1.1}
+.dlg-quote{
+  margin-top:18px;padding-left:16px;border-left:2px solid var(--ink-800);
+  font-family:var(--serif);font-size:16.5px;line-height:2;color:var(--ink-700);
+}
+.dlg-meta{margin-top:16px}
+.dlg-meta .meta-row .k{width:56px}
+.dlg-meta .meta-row .v{font-size:14px}
+.dlg-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--line)}
+
+/* 内联 SVG 图标 */
+.i{
+  display:block;width:1em;height:1em;flex:none;
+  fill:none;stroke:currentColor;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+.t-button--shape-circle{display:inline-flex;align-items:center;justify-content:center}
+.t-button--shape-circle .i{margin:0}
+
+/* 签纸自有的颗粒层，去掉公用面板的内框 */
+.sign-paper::after{border:none}
+
+/* 加载失败兜底 */
+.load-fail{
+  max-width:520px;margin:16vh auto;padding:34px;text-align:center;
+  border:1px solid var(--line-2);background:var(--paper-0);border-radius:3px;
+}
+.load-fail h3{font-family:var(--serif);font-size:20px;letter-spacing:.2em;margin-bottom:14px}
+.load-fail p{font-size:13px;line-height:2;color:var(--ink-500)}
+
+/* =========================================================
+   八、响应式
+   ========================================================= */
+@media (max-width:1240px){
+  .page{grid-template-columns:300px minmax(0,1fr);}
+  .log-panel{grid-column:1 / -1}
+  .log-list{max-height:280px}
+  .tier-stats{max-width:520px}
+}
+@media (max-width:900px){
+  .page{grid-template-columns:1fr;padding:16px 14px 28px;gap:14px}
+  .masthead{flex-direction:column;align-items:flex-start;gap:14px}
+  .masthead-right{justify-content:flex-start}
+  .poem{text-align:left}
+  .bamboo{display:none}
+  .sign-paper{padding:28px 22px 24px;min-height:auto}
+  .sign-empty{min-height:300px}
+  .vm{font-size:26px}
+  .brand-txt h1{font-size:24px}
+  .hero-quote{font-size:16.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<!-- 图标速用 -->
+<svg style="display:none" aria-hidden="true">
+  <symbol id="ic-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-reset" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<!-- 墨竹（右侧由脚本克隆，避免重复书写） -->
+<div class="bamboo bamboo-l" aria-hidden="true">
+  <svg id="bamboo-src" viewBox="0 0 200 1000" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="bx1" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#101010"/><stop offset=".34" stop-color="#4b4b45"/>
+        <stop offset=".58" stop-color="#1d1d1b"/><stop offset="1" stop-color="#080808"/>
+      </linearGradient>
+      <linearGradient id="bx2" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#161615"/><stop offset=".4" stop-color="#5a5a52"/>
+        <stop offset=".72" stop-color="#232321"/><stop offset="1" stop-color="#0d0d0c"/>
+      </linearGradient>
+      <linearGradient id="bx3" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#1d1d1b"/><stop offset=".45" stop-color="#63635a"/>
+        <stop offset="1" stop-color="#141412"/>
+      </linearGradient>
+      <linearGradient id="bfade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff"/><stop offset=".62" stop-color="#fff"/>
+        <stop offset="1" stop-color="#000"/>
+      </linearGradient>
+      <mask id="bmask"><rect x="0" y="0" width="200" height="1000" fill="url(#bfade)"/></mask>
+      <path id="leaf" d="M0 0C11 -4 31 -9 58 -7C32 2 11 6 0 0Z"/>
+    </defs>
+    <g mask="url(#bmask)">
+      <!-- 竹竿 -->
+      <path d="M38,1000 C34,820 42,640 38,470 C35,360 41,230 38,92" fill="none" stroke="url(#bx1)" stroke-width="17" stroke-linecap="round"/>
+      <path d="M104,1000 C100,830 108,660 104,510 C102,420 106,340 104,262" fill="none" stroke="url(#bx2)" stroke-width="13" stroke-linecap="round"/>
+      <path d="M160,1000 C156,880 164,760 160,640 C158,570 162,500 160,432" fill="none" stroke="url(#bx3)" stroke-width="10" stroke-linecap="round"/>
+      <!-- 竹节 -->
+      <g fill="none" stroke="#070707" stroke-width="2.4" stroke-linecap="round">
+        <path d="M29,176 Q38,182 47,176"/><path d="M29,326 Q38,332 47,326"/>
+        <path d="M29,486 Q38,492 47,486"/><path d="M30,646 Q38,652 46,646"/>
+        <path d="M30,806 Q38,812 46,806"/><path d="M30,946 Q38,952 46,946"/>
+        <path d="M96,320 Q104,326 112,320"/><path d="M96,470 Q104,476 112,470"/>
+        <path d="M96,624 Q104,630 112,624"/><path d="M97,778 Q104,784 111,778"/>
+        <path d="M96,920 Q104,926 112,920"/>
+        <path d="M154,486 Q160,492 166,486"/><path d="M154,626 Q160,632 166,626"/>
+        <path d="M155,772 Q160,778 165,772"/><path d="M155,904 Q160,910 165,904"/>
+      </g>
+      <!-- 枝叶 -->
+      <g fill="#0e0e0d">
+        <g transform="translate(52,178)">
+          <path d="M-12,2 C6,-2 16,-4 26,-6" fill="none" stroke="#101010" stroke-width="3" stroke-linecap="round"/>
+          <use href="#leaf" transform="rotate(-46) scale(.92)" opacity=".85"/>
+          <use href="#leaf" transform="rotate(-24) scale(1.02)" opacity=".95"/>
+          <use href="#leaf" transform="rotate(-2) scale(.88)" opacity=".8"/>
+          <use href="#leaf" transform="rotate(20) scale(.72)" opacity=".7"/>
+        </g>
+        <g transform="translate(50,488)">
+          <path d="M-10,-2 C6,-6 14,-8 24,-12" fill="none" stroke="#101010" stroke-width="2.6" stroke-linecap="round"/>
+          <use href="#leaf" transform="rotate(-38) scale(.8)" opacity=".8"/>
+          <use href="#leaf" transform="rotate(-14) scale(.9)" opacity=".9"/>
+          <use href="#leaf" transform="rotate(12) scale(.74)" opacity=".7"/>
+        </g>
+        <g transform="translate(28,646) scale(-1,1)">
+          <path d="M-10,-2 C6,-6 14,-8 24,-10" fill="none" stroke="#101010" stroke-width="2.4" stroke-linecap="round"/>
+          <use href="#leaf" transform="rotate(-34) scale(.78)" opacity=".78"/>
+          <use href="#leaf" transform="rotate(-8) scale(.86)" opacity=".86"/>
+          <use href="#leaf" transform="rotate(18) scale(.68)" opacity=".66"/>
+        </g>
+        <g transform="translate(116,322)">
+          <path d="M-10,0 C4,-4 12,-6 22,-8" fill="none" stroke="#101010" stroke-width="2.4" stroke-linecap="round"/>
+          <use href="#leaf" transform="rotate(-40) scale(.7)" opacity=".72"/>
+          <use href="#leaf" transform="rotate(-14) scale(.8)" opacity=".82"/>
+          <use href="#leaf" transform="rotate(12) scale(.62)" opacity=".6"/>
+        </g>
+        <g transform="translate(94,626) scale(-1,1)">
+          <path d="M-10,0 C4,-4 12,-6 22,-8" fill="none" stroke="#101010" stroke-width="2.2" stroke-linecap="round"/>
+          <use href="#leaf" transform="rotate(-36) scale(.66)" opacity=".68"/>
+          <use href="#leaf" transform="rotate(-10) scale(.74)" opacity=".76"/>
+          <use href="#leaf" transform="rotate(16) scale(.58)" opacity=".56"/>
+        </g>
+        <g transform="translate(170,488)">
+          <path d="M-8,0 C4,-4 10,-6 18,-8" fill="none" stroke="#101010" stroke-width="2" stroke-linecap="round"/>
+          <use href="#leaf" transform="rotate(-34) scale(.58)" opacity=".62"/>
+          <use href="#leaf" transform="rotate(-8) scale(.66)" opacity=".7"/>
+          <use href="#leaf" transform="rotate(18) scale(.5)" opacity=".5"/>
+        </g>
+        <g transform="translate(152,904) scale(-1,1)">
+          <path d="M-8,0 C4,-4 10,-6 18,-8" fill="none" stroke="#101010" stroke-width="2" stroke-linecap="round"/>
+          <use href="#leaf" transform="rotate(-30) scale(.54)" opacity=".58"/>
+          <use href="#leaf" transform="rotate(-4) scale(.62)" opacity=".64"/>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
+<div class="bamboo bamboo-r" id="bamboo-clone" aria-hidden="true"></div>
+
+<div class="grain"></div>
+<div class="blot blot-a"></div>
+<div class="blot blot-b"></div>
+<div class="blot blot-c"></div>
+
+<div id="app" v-cloak>
+  <div class="page">
+
+    <!-- ============ 抬头 ============ -->
+    <header class="masthead">
+      <div class="brand">
+        <div class="seal-badge">簽</div>
+        <div class="brand-txt">
+          <h1>江湖签</h1>
+          <p>Jin Yong · Wulin Fortune Sticks</p>
+        </div>
+      </div>
+      <div class="masthead-right">
+        <div class="poem">
+          <b>{{ dailyPoem.line }}</b><br />
+          <span class="poem-by">— {{ dailyPoem.by }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ 一、签筒 ============ -->
+    <section class="panel">
+      <div class="panel-head"><span class="ph-num">其 一</span>签 筒</div>
+
+      <div class="tube-wrap" :class="{clickable: !drawing}" role="button" tabindex="0"
+           :aria-label="drawing ? '摇签中' : '点击签筒或按空格摇签'"
+           @click="tubeTap" @keydown.enter.prevent="tubeTap" @keydown.space.prevent="tubeTap">
+        <svg class="tube-svg" viewBox="0 0 240 400" role="img" aria-label="竹制签筒">
+          <defs>
+            <linearGradient id="tubeG" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#0b0b09"/><stop offset=".24" stop-color="#3f3f39"/>
+              <stop offset=".46" stop-color="#5c5c53"/><stop offset=".68" stop-color="#22221f"/>
+              <stop offset="1" stop-color="#070706"/>
+            </linearGradient>
+            <linearGradient id="stickG" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#bdb6a6"/><stop offset=".38" stop-color="#f4f0e6"/>
+              <stop offset="1" stop-color="#aca595"/>
+            </linearGradient>
+            <radialGradient id="rimG" cx=".5" cy=".42" r=".62">
+              <stop offset="0" stop-color="#050505"/><stop offset=".62" stop-color="#171715"/>
+              <stop offset="1" stop-color="#3d3d37"/>
+            </radialGradient>
+          </defs>
+
+          <ellipse class="tube-shadow" cx="120" cy="390" rx="74" ry="9" fill="rgba(40,38,32,.22)"/>
+
+          <!-- 签（先画，筒身覆盖其下段） -->
+          <g class="sticks" :class="{rattling: rattling}">
+            <g v-for="s in sticks" :key="s.id" :transform="'translate(' + s.x + ',200) rotate(' + s.rot + ')'">
+              <g class="stick-inner" :class="{picked: picked === s.id}" :style="{animationDelay: s.delay + 's'}">
+                <rect class="stick-body" x="-3.5" :y="-s.len" width="7" :height="s.len + 16" rx="3.5" fill="url(#stickG)"/>
+                <line x1="-3.5" :y1="-s.len + 30" x2="3.5" :y2="-s.len + 30" stroke="rgba(90,85,75,.32)" stroke-width="1"/>
+                <line x1="-3.5" :y1="-s.len + 62" x2="3.5" :y2="-s.len + 62" stroke="rgba(90,85,75,.24)" stroke-width="1"/>
+                <rect x="-3.5" :y="-s.len" width="2.4" :height="s.len + 14" rx="1.2" fill="rgba(255,255,255,.42)"/>
+                <rect v-if="picked === s.id" x="-4.4" :y="-s.len - 3" width="8.8" height="11" rx="2" fill="#8f3a32"/>
+              </g>
+            </g>
+          </g>
+
+          <!-- 筒身 -->
+          <g class="tube-shaker" :class="{shaking: rattling || pulling}">
+            <path d="M58,196 L182,196 L182,370 Q182,392 160,392 L80,392 Q58,392 58,370 Z" fill="url(#tubeG)"/>
+            <path d="M58,196 L182,196 L182,370 Q182,392 160,392 L80,392 Q58,392 58,370 Z" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="1"/>
+            <g fill="none" stroke="rgba(0,0,0,.55)" stroke-linecap="round">
+              <path d="M58,262 Q120,278 182,262" stroke-width="3.4"/>
+              <path d="M58,258 Q120,274 182,258" stroke-width="1"/>
+              <path d="M58,332 Q120,348 182,332" stroke-width="3.4"/>
+              <path d="M58,328 Q120,344 182,328" stroke-width="1"/>
+            </g>
+            <g fill="none" stroke="rgba(255,255,255,.10)" stroke-linecap="round">
+              <path d="M74,200 C70,270 78,330 74,388" stroke-width="2.5"/>
+              <path d="M100,202 C96,280 104,340 100,390" stroke-width="1.6"/>
+              <path d="M146,202 C150,280 142,340 146,390" stroke-width="1.6"/>
+            </g>
+            <!-- 筒口 -->
+            <ellipse cx="120" cy="196" rx="62" ry="15" fill="url(#rimG)"/>
+            <ellipse cx="120" cy="196" rx="62" ry="15" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="1.2"/>
+            <ellipse cx="120" cy="197" rx="51" ry="10.5" fill="#060606" opacity=".9"/>
+            <path d="M69,196 Q120,182 171,196" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="1.4"/>
+            <!-- 筒身题字 -->
+            <text x="120" y="300" text-anchor="middle" fill="rgba(245,242,234,.86)"
+                  style="font-family:'Songti SC','STSong',serif;font-size:30px;letter-spacing:6px;font-weight:700">江 湖</text>
+            <text x="120" y="342" text-anchor="middle" fill="rgba(245,242,234,.5)"
+                  style="font-family:'Songti SC','STSong',serif;font-size:12px;letter-spacing:7px">签</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="draw-btn">
+        <t-button theme="primary" :loading="drawing" :disabled="drawing" @click="draw">
+          {{ drawing ? '摇 签 中' : '摇 签' }}
+        </t-button>
+      </div>
+      <div class="hint-key">点击签筒、按 <kbd>空格</kbd> 或 <kbd>N</kbd> 摇签</div>
+
+      <div class="ctrl">
+        <div class="ctrl-row">
+          <span class="lab">签 谱</span>
+          <t-select v-model="book" :options="bookOptions" size="small"></t-select>
+        </div>
+        <div class="ctrl-row">
+          <span class="lab">不 重 签 <span class="tip">已抽者不再出现</span></span>
+          <t-switch v-model="noRepeat" size="small"></t-switch>
+        </div>
+        <div class="ctrl-row">
+          <span class="lab">竹 音 <span class="tip">签筒碰撞之声</span></span>
+          <t-switch v-model="sound" size="small"></t-switch>
+        </div>
+      </div>
+
+      <div class="remain">
+        <span>签筒所余 <b>{{ pool.length }}</b> 位</span>
+        <span>已收录 <b>{{ collectedCount }}</b> / {{ characters.length }}</span>
+      </div>
+    </section>
+
+    <!-- ============ 二、签纸 ============ -->
+    <section class="panel sign-paper" aria-live="polite">
+      <div class="sign-inner">
+        <!-- 空签 -->
+        <div v-if="!result" class="sign-empty">
+          <div class="vm">{{ pool.length ? '心诚则灵' : '签筒已空' }}</div>
+          <p class="sub">
+            摇动签筒，看看今夜的江湖<em>属于谁</em><br />
+            共 <em>{{ characters.length }}</em> 位江湖人物 · 十三部金庸小说
+          </p>
+        </div>
+
+        <!-- 签文 -->
+        <div v-else class="sign-body" :key="revealKey">
+          <div class="anim sign-head">
+            <span class="sign-no">第 {{ cnNum(result.no) }} 签</span>
+            <span class="tier-chip" :class="'t' + result.tier">
+              <span class="dots">
+                <i v-for="n in 5" :key="n" :class="{on: n <= result.tier}"></i>
+              </span>
+              <span class="tier-name">{{ tierInfo(result.tier).name }}</span>
+              <span class="tier-label">· {{ tierInfo(result.tier).label }}</span>
+            </span>
+          </div>
+
+          <div class="anim hero">
+            <h2 class="hero-name">{{ result.name }}</h2>
+            <div class="hero-role">{{ bookFull(result.book) }} · {{ result.role }}</div>
+            <blockquote class="hero-quote">「{{ result.quote }}」</blockquote>
+          </div>
+
+          <div class="anim meta">
+            <div class="meta-row"><span class="k">出 处</span><span class="v">{{ bookFull(result.book) }}</span></div>
+            <div class="meta-row"><span class="k">身 份</span><span class="v">{{ result.role }}</span></div>
+            <div class="meta-row"><span class="k">绝 技</span><span class="v">{{ result.arts }}</span></div>
+            <div class="meta-row"><span class="k">签 运</span><span class="v">{{ tierInfo(result.tier).name }} · {{ tierInfo(result.tier).label }}</span></div>
+          </div>
+
+          <div class="anim sign-foot">
+            <div class="stamp">
+              落签于 {{ result.time }}<br />
+              江湖签 · 第 {{ cnNum(result.no) }} 签
+            </div>
+            <div class="seal-mark">簽</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 三、签录 ============ -->
+    <aside class="panel log-panel">
+      <div class="panel-head"><span class="ph-num">其 三</span>签 录</div>
+
+      <div class="progress-wrap">
+        <div class="progress-line">
+          <span>收录进度</span>
+          <span><b>{{ collectedCount }}</b> / {{ characters.length }}</span>
+        </div>
+        <t-progress theme="line" :percentage="progressPct" :label="false"></t-progress>
+      </div>
+
+      <div class="tier-stats">
+        <div class="tier-stat" :class="'ts-' + t" v-for="t in [5,4,3,2,1]" :key="t">
+          <span class="ts-name">{{ tierInfo(t).name }}</span>
+          <span class="ts-num">{{ tierCount(t) }}</span>
+          <span class="ts-bar"><i :style="{width: tierPct(t) + '%'}"></i></span>
+        </div>
+      </div>
+
+      <div class="log-list">
+        <div v-if="!history.length" class="log-empty">尚 无 签 录<br />摇 一 摇 签 筒</div>
+        <div v-for="(it, i) in history" :key="it.id" class="log-item" :class="'lt-' + it.tier" @click="openDetail(it)">
+          <span class="log-idx">{{ history.length - i }}</span>
+          <div class="log-main">
+            <div class="log-name">
+              {{ it.name }}
+              <span class="log-tier" :class="'t' + it.tier">{{ tierInfo(it.tier).name }}</span>
+            </div>
+            <div class="log-sub">{{ it.book }} · {{ it.time }}</div>
+          </div>
+          <t-button class="log-del" theme="danger" variant="text" shape="circle" size="small"
+                    aria-label="删除该签" @click.stop="removeOne(it)">
+            <i-icon name="trash" style="font-size:15px"></i-icon>
+          </t-button>
+        </div>
+      </div>
+
+      <div class="streak">
+        <div class="streak-item">
+          <span class="streak-k">连摇</span>
+          <span class="streak-v">{{ streakCount }}</span>
+        </div>
+        <div class="streak-item">
+          <span class="streak-k">最高</span>
+          <span class="streak-v" :class="'tier-chip t' + maxTierSeen">
+            <span class="dots"><i v-for="n in 5" :key="n" :class="{on: n <= maxTierSeen}"></i></span>
+            <span class="tier-name">{{ maxTierSeen ? tierInfo(maxTierSeen).name : '—' }}</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="log-foot">
+        <t-button variant="outline" size="small" @click="openReset">
+          <i-icon name="reset" style="font-size:14px;margin-right:6px"></i-icon>重置
+        </t-button>
+        <t-button variant="outline" size="small" @click="copyRecords">抄录</t-button>
+        <t-button variant="outline" size="small" @click="exportTxt">导出</t-button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- 签文详情 -->
+  <t-dialog v-model:visible="detailVisible" header="签 文" width="460px" :footer="false" placement="center">
+    <div class="dlg-body" v-if="detail">
+      <div class="dlg-hero">
+        <span class="dlg-name">{{ detail.name }}</span>
+        <span class="tier-chip" :class="'t' + detail.tier">
+          <span class="dots"><i v-for="n in 5" :key="n" :class="{on: n <= detail.tier}"></i></span>
+          <span class="tier-name">{{ tierInfo(detail.tier).name }}</span>
+        </span>
+      </div>
+      <blockquote class="dlg-quote">「{{ detail.quote }}」</blockquote>
+      <div class="dlg-meta">
+        <div class="meta-row"><span class="k">出 处</span><span class="v">{{ bookFull(detail.book) }}</span></div>
+        <div class="meta-row"><span class="k">身 份</span><span class="v">{{ detail.role }}</span></div>
+        <div class="meta-row"><span class="k">绝 技</span><span class="v">{{ detail.arts }}</span></div>
+        <div class="meta-row"><span class="k">签 运</span><span class="v">{{ tierInfo(detail.tier).name }} · {{ tierInfo(detail.tier).label }}</span></div>
+        <div class="meta-row"><span class="k">落 签</span><span class="v">{{ detail.time }}</span></div>
+      </div>
+      <div class="dlg-foot">
+        <t-button variant="outline" size="small" @click="detailVisible = false">合 上</t-button>
+        <t-button theme="primary" size="small" @click="drawAgainFromDetail">再 抽 一 签</t-button>
+      </div>
+    </div>
+  </t-dialog>
+
+  <!-- 重置确认 -->
+  <t-dialog v-model:visible="resetVisible" header="重置签录" width="400px" placement="center">
+    <p style="font-family:var(--serif);font-size:14px;line-height:2.1;color:var(--ink-600)">
+      重置之后，签录与收录进度将一并抹去，签筒重回满签。此事不可挽回。
+    </p>
+    <template #footer>
+      <t-button variant="outline" @click="resetVisible = false">再 想 想</t-button>
+      <t-button theme="primary" @click="doReset">重 置</t-button>
+    </template>
+  </t-dialog>
+</div>
+
+<script>
+(function () {
+  /* 右侧墨竹：克隆左竹并镜像，避免重复书写 SVG */
+  try {
+    var src = document.getElementById('bamboo-src');
+    var slot = document.getElementById('bamboo-clone');
+    if (src && slot) {
+      var clone = src.cloneNode(true);
+      clone.removeAttribute('id');
+      slot.appendChild(clone);
+    }
+  } catch (e) { /* 装饰失败不影响使用 */ }
+
+  if (!window.Vue || !window.TDesign) {
+    document.getElementById('app').innerHTML =
+      '<div class="load-fail"><h3>签 筒 未 就</h3>' +
+      '<p>本页面通过 CDN 加载 Vue 3 与 TDesign 组件库，请确认可访问 cdn.jsdelivr.net 后刷新重试。</p></div>';
+    document.getElementById('app').removeAttribute('v-cloak');
+    return;
+  }
+
+  var Vue = window.Vue;
+  var TDesign = window.TDesign;
+  var ref = Vue.ref, computed = Vue.computed, watch = Vue.watch,
+    onMounted = Vue.onMounted, onUnmounted = Vue.onUnmounted;
+
+  var Message = (TDesign && TDesign.MessagePlugin) || {
+    success: function () {}, error: function () {}, info: function () {}, warning: function () {}
+  };
+  function toast(type, msg) {
+    try { Message[type] && Message[type]({ content: msg, placement: 'top' }); } catch (e) { }
+  }
+
+  /* =======================================================
+     签运五等
+     ======================================================= */
+  var TIERS = {
+    5: { name: '天机签', label: '天下无双', short: '天机', weight: 2 },
+    4: { name: '上上签', label: '绝顶宗师', short: '上上', weight: 8 },
+    3: { name: '上吉签', label: '一流高手', short: '上吉', weight: 20 },
+    2: { name: '中吉签', label: '江湖侠客', short: '中吉', weight: 24 },
+    1: { name: '平签', label: '寻常人物', short: '平', weight: 16 }
+  };
+
+  /* =======================================================
+     签谱：名 / 出处 / 身份 / 绝技 / 签语 / 签运
+     ======================================================= */
+  var ROSTER = [
+    /* —— 天机签 · 天下无双 —— */
+    ['独孤求败', '神雕侠侣', '剑冢隐士 · 剑魔', '独孤九剑 · 重剑无锋', '无剑胜有剑，无招胜有招', 5],
+    ['扫地僧', '天龙八部', '少林寺藏经阁老僧', '少林七十二绝技 · 易筋经', '武功越高，戾气越重，须以佛法化解', 5],
+    ['张三丰', '倚天屠龙记', '武当派开山祖师', '太极拳 · 太极剑', '以慢打快，以静制动，后发制人', 5],
+    ['东方不败', '笑傲江湖', '日月神教教主', '葵花宝典 · 绣花针', '天下武功，唯快不破', 5],
+    ['石破天', '侠客行', '长乐帮帮主 · 太玄经传人', '太玄经 · 罗汉伏魔神功', '心无所住，而悟大道', 5],
+    ['黄裳', '射雕英雄传', '宋廷文官 · 九阴真经著者', '九阴真经 · 大伏魔拳', '天之道，损有余而补不足', 5],
+
+    /* —— 上上签 · 绝顶宗师 —— */
+    ['萧峰', '天龙八部', '丐帮帮主 · 辽国南院大王', '降龙十八掌 · 打狗棒法', '萧某大好男儿，竟与你这种人齐名', 4],
+    ['郭靖', '射雕英雄传', '北侠 · 桃花岛婿', '降龙十八掌 · 九阴真经', '侠之大者，为国为民', 4],
+    ['杨过', '神雕侠侣', '西狂 · 神雕大侠', '黯然销魂掌 · 玄铁剑法', '十六年之约，我等你', 4],
+    ['张无忌', '倚天屠龙记', '明教第三十四代教主', '九阳神功 · 乾坤大挪移', '他强由他强，清风拂山岗', 4],
+    ['令狐冲', '笑傲江湖', '恒山派掌门 · 华山弃徒', '独孤九剑 · 吸星大法', '行云流水，任意所至', 4],
+    ['黄药师', '射雕英雄传', '东邪 · 桃花岛主', '弹指神通 · 落英神剑掌', '桃花影落飞神剑，碧海潮生按玉箫', 4],
+    ['欧阳锋', '射雕英雄传', '西毒 · 白驼山庄主', '蛤蟆功 · 逆练九阴真经', '逆练真经，颠倒乾坤', 4],
+    ['洪七公', '射雕英雄传', '北丐 · 丐帮帮主', '降龙十八掌 · 打狗棒法', '老叫化一生杀过二百三十一人，个个都是恶徒', 4],
+    ['一灯大师', '射雕英雄传', '南帝 · 大理段皇爷', '一阳指 · 先天功', '一灯既灭，何妨渡人', 4],
+    ['风清扬', '笑傲江湖', '华山剑宗前辈 · 隐士', '独孤九剑', '剑法讲究行云流水，任意所至', 4],
+    ['周伯通', '射雕英雄传', '老顽童 · 全真教', '空明拳 · 左右互搏', '左手画方，右手画圆，好玩得紧', 4],
+    ['金轮法王', '神雕侠侣', '蒙古国师', '龙象般若功 · 五轮大转', '龙象般若，力近十龙十象', 4],
+    ['段誉', '天龙八部', '大理世子 · 镇南王之子', '六脉神剑 · 北冥神功 · 凌波微步', '神仙姊姊，我但求一见', 4],
+    ['虚竹', '天龙八部', '灵鹫宫主 · 逍遥派传人', '天山六阳掌 · 小无相功', '我本只想做个小和尚', 4],
+    ['天山童姥', '天龙八部', '灵鹫宫旧主 · 缥缈峰', '八荒六合唯我独尊功 · 生死符', '返老还童，唯我独尊', 4],
+    ['鸠摩智', '天龙八部', '吐蕃国师 · 大雪山大轮寺', '火焰刀 · 小无相功', '贫僧远来，只为一睹中原武学', 4],
+    ['慕容博', '天龙八部', '姑苏慕容家主', '斗转星移 · 参合指', '复国大业，不惜诈死三十年', 4],
+    ['萧远山', '天龙八部', '契丹绝顶高手', '少林诸般绝技', '血海深仇，三十年不晚', 4],
+    ['任我行', '笑傲江湖', '日月神教教主', '吸星大法 · 掌法雄浑', '吸星大法，天下无敌', 4],
+    ['岳不群', '笑傲江湖', '华山派掌门 · 君子剑', '紫霞神功 · 辟邪剑法', '君子剑下，未必无血', 4],
+    ['左冷禅', '笑傲江湖', '嵩山派掌门 · 五岳盟主', '寒冰真气 · 大嵩阳神掌', '五岳并派，舍我其谁', 4],
+    ['苗人凤', '雪山飞狐', '金面佛 · 打遍天下无敌手', '苗家剑法', '生平快意恩仇，唯愧一人', 4],
+    ['成昆', '倚天屠龙记', '混元霹雳手 · 圆真和尚', '混元功 · 幻阴指', '此身入空门，此心不空', 4],
+
+    /* —— 上吉签 · 一流高手 —— */
+    ['黄蓉', '射雕英雄传', '丐帮帮主 · 桃花岛主之女', '打狗棒法 · 奇门遁甲', '靖哥哥，你一辈子都要待我好', 3],
+    ['小龙女', '神雕侠侣', '古墓派掌门', '玉女素心剑法 · 九阴真经', '过儿，我在这里', 3],
+    ['李莫愁', '神雕侠侣', '赤练仙子 · 古墓派', '五毒神掌 · 冰魄银针', '问世间情是何物，直教生死相许', 3],
+    ['梅超风', '射雕英雄传', '黑风双煞 · 铁尸', '九阴白骨爪 · 摧心掌', '我虽作恶多端，却也有恩师之情', 3],
+    ['周芷若', '倚天屠龙记', '峨眉派第四代掌门', '峨眉剑法 · 九阴白骨爪', '问心有愧的，从来是你', 3],
+    ['王语嫣', '天龙八部', '曼陀山庄 · 武学活字典', '通晓天下武学', '天下武功我皆识得，却一招也使不出', 3],
+    ['慕容复', '天龙八部', '姑苏慕容公子 · 南慕容', '斗转星移 · 参合指', '以彼之道，还施彼身', 3],
+    ['段正淳', '天龙八部', '大理镇南王', '五罗轻烟掌 · 一阳指', '处处留情，终究难全', 3],
+    ['段延庆', '天龙八部', '四大恶人之首 · 恶贯满盈', '腹语术 · 一阳指', '我本是大理太子', 3],
+    ['谢逊', '倚天屠龙记', '金毛狮王 · 明教四大法王', '七伤拳 · 狮吼功', '七伤拳出，先伤己身', 3],
+    ['杨逍', '倚天屠龙记', '明教光明左使', '乾坤大挪移 · 弹指神通', '光明磊落，逍遥自在', 3],
+    ['范遥', '倚天屠龙记', '光明右使 · 苦头陀', '伏魔杖法 · 易容术', '忍辱二十年，只为一人', 3],
+    ['殷天正', '倚天屠龙记', '天鹰教教主 · 白眉鹰王', '鹰爪擒拿手', '天鹰教众，随我回光明顶', 3],
+    ['韦一笑', '倚天屠龙记', '青翼蝠王 · 明教法王', '寒冰绵掌 · 轻功卓绝', '来去如风，血冷如霜', 3],
+    ['黛绮丝', '倚天屠龙记', '紫衫龙王 · 波斯圣女', '波斯明教武学', '波斯圣女，客居中原二十载', 3],
+    ['灭绝师太', '倚天屠龙记', '峨眉派掌门', '峨眉剑法 · 飘雪穿云掌', '峨眉门下，宁为玉碎', 3],
+    ['张翠山', '倚天屠龙记', '武当七侠 · 银钩铁划', '铁划银钩 · 武当剑法', '铁划银钩，侠骨仁心', 3],
+    ['赵敏', '倚天屠龙记', '汝阳王府郡主', '机敏果决 · 精通谋略', '我偏要勉强', 3],
+    ['郭襄', '神雕侠侣', '郭二小姐 · 峨眉开山祖师', '兰花拂穴手 · 一阳指', '一见杨过误终身', 3],
+    ['程英', '神雕侠侣', '桃花岛门人 · 陆家庄', '弹指神通 · 玉箫剑法', '既见君子，云胡不喜', 3],
+    ['裘千仞', '射雕英雄传', '铁掌水上漂 · 铁掌帮主', '铁掌功 · 水上漂', '铁掌之下，少有完人', 3],
+    ['瑛姑', '射雕英雄传', '神算子 · 大理旧妃', '泥鳅功 · 算术通神', '一灯，我恨你一生', 3],
+    ['杨康', '射雕英雄传', '金国小王爷 · 杨铁心之子', '全真剑法 · 九阴白骨爪', '富贵在手，何必认祖归宗', 3],
+    ['程灵素', '飞狐外传', '毒手药王关门弟子', '七心海棠 · 天下第一毒', '以毒攻毒，以心换心', 3],
+    ['胡斐', '飞狐外传', '雪山飞狐 · 辽东胡家', '胡家刀法 · 拳经刀谱', '路见不平，拔刀相助', 3],
+    ['陈家洛', '书剑恩仇录', '红花会总舵主', '百花错拳 · 庖丁解牛掌', '书剑飘零，家国难全', 3],
+    ['霍青桐', '书剑恩仇录', '翠羽黄衫 · 回部首领', '回部武学 · 用兵如神', '一肩担尽部族安危', 3],
+    ['袁承志', '碧血剑', '华山派弟子 · 七省武林盟主', '混元功 · 金蛇剑法', '碧血剑寒，志在苍生', 3],
+    ['狄云', '连城诀', '血刀门传人 · 神照经得主', '神照经 · 血刀经', '人心，比刀剑更冷', 3],
+    ['白自在', '侠客行', '雪山派掌门 · 威德先生', '雪山剑法 · 内功深厚', '我白自在，天下第一', 3],
+
+    /* —— 中吉签 · 江湖侠客 —— */
+    ['殷素素', '倚天屠龙记', '天鹰教主之女 · 武当五侠之妻', '蚊须针 · 袖箭', '越是好看的女人，越会骗人', 2],
+    ['小昭', '倚天屠龙记', '明教波斯总教圣女', '乾坤大挪移心法', '公子恩情，小昭永世不忘', 2],
+    ['阿朱', '天龙八部', '慕容家婢女 · 易容高手', '易容术 · 巧言善辩', '我扮作谁都行，只不扮作自己', 2],
+    ['阿紫', '天龙八部', '星宿派弟子 · 小妖女', '腐尸毒 · 毒功', '以毒为乐，以爱为囚', 2],
+    ['钟灵', '天龙八部', '万劫谷少女', '御貂之术 · 闪电貂', '貂儿，去', 2],
+    ['木婉清', '天龙八部', '幽谷客 · 段誉义妹', '袖箭 · 轻功', '见我真容者，或娶，或死', 2],
+    ['韦小宝', '鹿鼎记', '御前侍卫 · 天地会青木堂香主', '神行百变 · 撒石灰', '讲道理不如讲交情，讲交情不如讲银子', 2],
+    ['双儿', '鹿鼎记', '韦家夫人 · 大丫鬟', '小擒拿手', '相公，我心里只有你一个', 2],
+    ['苏荃', '鹿鼎记', '神龙教洪夫人', '神龙教武学 · 心思缜密', '教主夫人，亦可自择其主', 2],
+    ['柯镇恶', '射雕英雄传', '江南七怪之首 · 飞天蝙蝠', '伏魔杖法', '飞天蝙蝠，眼盲心明', 2],
+    ['朱聪', '射雕英雄传', '江南七怪 · 妙手书生', '妙手空空 · 分筋错骨手', '妙手空空，取之有道', 2],
+    ['穆念慈', '射雕英雄传', '杨铁心义女 · 杨康之妻', '武学粗浅 · 心性坚贞', '我只要你平安', 2],
+    ['说不得', '倚天屠龙记', '明教五散人 · 布袋和尚', '布袋功', '布袋和尚，装得下天下', 2],
+    ['周颠', '倚天屠龙记', '明教五散人 · 疯道人', '硬功 · 口无遮拦', '我就是不服', 2],
+    ['田伯光', '笑傲江湖', '万里独行 · 快刀', '快刀刀法 · 轻功', '我田伯光说话算话', 2],
+    ['仪琳', '笑傲江湖', '恒山派尼姑', '恒山剑法', '我佛慈悲，也求心安', 2],
+    ['平一指', '笑傲江湖', '杀人名医', '医术通神 · 内伤诊疗', '医一人，杀一人；杀一人，医一人', 2],
+    ['祖千秋', '笑傲江湖', '五霸冈群豪 · 品酒名家', '品酒识杯 · 见识广博', '饮酒须配酒杯，方能品出真味', 2],
+    ['曲洋', '笑傲江湖', '日月神教长老 · 琴痴', '笑傲江湖曲 · 音律', '高山流水，知音难觅', 2],
+    ['刘正风', '笑傲江湖', '衡山派 · 金盆洗手', '回风落雁剑', '金盆洗手，欲退江湖而不得', 2],
+    ['李文秀', '白马啸西风', '哈萨克草原汉女', '粗浅武学 · 心志坚韧', '那都是很好很好的，可是我偏不喜欢', 2],
+    ['陆无双', '神雕侠侣', '古墓派门人 · 陆家庄遗孤', '玉女剑法', '我跛了腿，却不缺志气', 2],
+    ['耶律齐', '神雕侠侣', '辽国皇裔 · 丐帮帮主', '降龙十八掌 · 全真剑法', '身在异邦，心向中土', 2],
+    ['桃根仙', '笑傲江湖', '桃谷六仙之一', '撕人绝技', '我们六兄弟，一起来', 2],
+
+    /* —— 平签 · 寻常人物 —— */
+    ['傻姑', '射雕英雄传', '牛家村孤女', '三招火叉', '我叫傻姑，我不傻', 1],
+    ['包惜弱', '射雕英雄传', '牛家村农妇 · 杨铁心之妻', '不通武艺 · 心慈面软', '柔心处世，命途多舛', 1],
+    ['林震南', '笑傲江湖', '福威镖局总镖头', '辟邪刀法 · 粗通拳脚', '福威镖局，威震江南', 1],
+    ['戚芳', '连城诀', '狄云师妹 · 万圭之妻', '粗浅武学', '我等了你，又不等你', 1],
+    ['阿绣', '侠客行', '雪山派女弟子', '雪山剑法', '石郎，我等你回来', 1],
+    ['阿珂', '鹿鼎记', '陈圆圆之女', '不通武艺', '我要嫁天下第一等的人物', 1],
+    ['香香公主', '书剑恩仇录', '回部公主 · 喀丝丽', '不通武艺 · 天生丽质', '愿天下人都不必再打仗', 1],
+    ['沐剑屏', '鹿鼎记', '沐王府小郡主', '不通武艺', '宫里的事，我什么都不懂', 1],
+    ['华筝', '射雕英雄传', '蒙古公主', '骑射娴熟', '你终究是要回中原的', 1],
+    ['建宁公主', '鹿鼎记', '大清公主', '不通武艺 · 蛮横娇纵', '我要你陪我玩一辈子', 1]
+  ];
+
+  var CHARACTERS = ROSTER.map(function (r) {
+    return { name: r[0], book: r[1], role: r[2], arts: r[3], quote: r[4], tier: r[5] };
+  });
+
+  var BOOKS = (function () {
+    var seen = {};
+    CHARACTERS.forEach(function (c) { seen[c.book] = (seen[c.book] || 0) + 1; });
+    return Object.keys(seen).sort(function (a, b) { return seen[b] - seen[a]; });
+  })();
+
+  var ALL = '全部签谱';
+  var BOOK_OPTIONS = [{ label: ALL + '（' + CHARACTERS.length + '）', value: ALL }].concat(
+    BOOKS.map(function (b) {
+      return { label: '《' + b + '》（' + CHARACTERS.filter(function (c) { return c.book === b; }).length + '）', value: b };
+    })
+  );
+
+  /* =======================================================
+     开篇诗：以日期为种子每日轮换，避免每次刷新都换诗
+     ======================================================= */
+  var POEMS = [
+    { line: '签筒之中，藏着整个江湖。', by: '江 湖 签' },
+    { line: '少年十五二十时，步行夺得胡马骑。', by: '王 维 · 《老将行》' },
+    { line: '十年磨一剑，霜刃未曾试。', by: '贾 岛 · 《剑客》' },
+    { line: '满堂花醉三千客，一剑霜寒十四州。', by: '贯 休 · 《献钱尚父》' },
+    { line: '相逢不必问谁是，纵使相逢亦不识。', by: '江 湖 签' },
+    { line: '欲穷千里目，更上一层楼。', by: '王 之 涣 · 《登鹳雀楼》' },
+    { line: '莫愁前路无知己，天下谁人不识君。', by: '高 适 · 《别董大》' },
+    { line: '今夕何夕，见此良人。', by: '《诗经 · 唐风 · 绸缪》' },
+    { line: '问世间，情为何物，直教生死相许。', by: '元 好 问 · 《摸鱼儿》' },
+    { line: '人生如逆旅，我亦是行人。', by: '苏 轼 · 《临江仙》' },
+    { line: '风烟俱净，天山共色，从流飘荡任意东西。', by: '吴 均 · 《与朱元思书》' },
+    { line: '醉后不知天在水，满船清梦压星河。', by: '唐 珙 · 《题龙阳县青草湖》' },
+    { line: '沧海一声笑，滔滔两岸潮。', by: '《沧海一声笑》' },
+    { line: '他年我若为青帝，报与桃花一处开。', by: '黄 巢 · 《题菊花》' },
+    { line: '应是天仙狂醉，乱把白云揉碎。', by: '李 白 · 《清平乐》' },
+    { line: '我见青山多妩媚，料青山见我应如是。', by: '辛 弃 疾 · 《贺新郎》' },
+    { line: '竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。', by: '苏 轼 · 《定风波》' },
+    { line: '一箫一剑平生意，负尽狂名十五年。', by: '龚 自 珍 · 《漫感》' },
+    { line: '青山依旧在，几度夕阳红。', by: '杨 慎 · 《临江仙》' },
+    { line: '莫听穿林打叶声，何妨吟啸且徐行。', by: '苏 轼 · 《定风波》' },
+    { line: '愿乘长风破万里浪。', by: '《宋书 · 宗悫传》' },
+    { line: '会当凌绝顶，一览众山小。', by: '杜 甫 · 《望岳》' }
+  ];
+  function pickDailyPoem() {
+    var key = new Date().toISOString().slice(0, 10);   // YYYY-MM-DD
+    var seed = 0;
+    for (var i = 0; i < key.length; i++) { seed = (seed * 31 + key.charCodeAt(i)) >>> 0; }
+    return POEMS[seed % POEMS.length];
+  }
+
+  /* =======================================================
+     小工具
+     ======================================================= */
+  var CN_DIGIT = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+  function cnNum(n) {
+    n = Math.max(0, Math.floor(n));
+    if (n === 0) return CN_DIGIT[0];
+    if (n < 10) return CN_DIGIT[n];
+    if (n < 20) return '十' + (n % 10 ? CN_DIGIT[n % 10] : '');
+    if (n < 100) return CN_DIGIT[Math.floor(n / 10)] + '十' + (n % 10 ? CN_DIGIT[n % 10] : '');
+    return String(n);
+  }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function nowText() {
+    var d = new Date();
+    return pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function bookFull(b) { return '《' + b + '》'; }
+
+  /* =======================================================
+     竹音：签筒碰撞 + 抽中磬声
+     ======================================================= */
+  var audioCtx = null;
+  function audio(on) {
+    if (!on) return null;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    } catch (e) { return null; }
+  }
+  function playClatter(on) {
+    var ctx = audio(on);
+    if (!ctx) return;
+    var t0 = ctx.currentTime;
+    for (var i = 0; i < 16; i++) {
+      var t = t0 + i * 0.052 + Math.random() * 0.02;
+      var osc = ctx.createOscillator();
+      var bp = ctx.createBiquadFilter();
+      var g = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = 360 + Math.random() * 880;
+      bp.type = 'bandpass';
+      bp.frequency.value = 1100 + Math.random() * 1700;
+      bp.Q.value = 1.1;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.045 + Math.random() * 0.05, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+      osc.connect(bp); bp.connect(g); g.connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.12);
+    }
+  }
+  function playChime(on) {
+    var ctx = audio(on);
+    if (!ctx) return;
+    var t0 = ctx.currentTime;
+    [660, 990, 1320].forEach(function (f, i) {
+      var osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(0.11 / (i + 1), t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.7);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(t0); osc.stop(t0 + 1.9);
+    });
+  }
+
+  /* =======================================================
+     存储
+     ======================================================= */
+  var STORE_KEY = 'jianghu-fortune-sticks-v1';
+  function loadStore() {
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function saveStore(data) {
+    try { window.localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) { /* 隐私模式下静默失败 */ }
+  }
+
+  /* =======================================================
+     主应用
+     ======================================================= */
+  var saved = loadStore() || {};
+  var app = Vue.createApp({
+    setup: function () {
+      var sticks = ref([]);
+      var rattling = ref(false);
+      var pulling = ref(false);
+      var picked = ref(-1);
+      var drawing = ref(false);
+      var result = ref(null);
+      var revealKey = ref(0);
+      var history = ref(Array.isArray(saved.history) ? saved.history : []);
+      var book = ref(saved.book || ALL);
+      var noRepeat = ref(saved.noRepeat !== false);
+      var sound = ref(saved.sound !== false);
+      var detailVisible = ref(false);
+      var detail = ref(null);
+      var resetVisible = ref(false);
+      var streakCount = ref(Number(saved.streakCount) || 0);
+      var maxTierSeen = ref(Number(saved.maxTierSeen) || 0);
+      var dailyPoem = ref(pickDailyPoem());
+      var timers = [];
+
+      function wait(fn, ms) { timers.push(window.setTimeout(fn, ms)); }
+
+      /* 摇签震动反馈（仅触觉 API 支持的设备生效） */
+      function vibe(pattern) {
+        if (!sound.value) return;        // 与「竹音」开关合并，省电
+        try {
+          if (window.navigator && typeof window.navigator.vibrate === 'function') {
+            window.navigator.vibrate(pattern || [12, 18, 26]);
+          }
+        } catch (e) { /* 不支持则静默 */ }
+      }
+
+      /* 点击签筒：未摇签时触发摇签 */
+      function tubeTap() {
+        if (drawing.value) return;
+        draw();
+      }
+
+      function initSticks() {
+        var n = 9, arr = [];
+        for (var i = 0; i < n; i++) {
+          var t = (n === 1) ? 0 : (i / (n - 1) - 0.5);
+          arr.push({
+            id: i,
+            x: +(120 + t * 72).toFixed(1),
+            rot: +(t * 13).toFixed(2),
+            len: 100 + (i % 4) * 11,
+            delay: +(i * 0.045).toFixed(2)
+          });
+        }
+        sticks.value = arr;
+      }
+
+      /* ---- 计算属性 ---- */
+      initSticks();
+      var basePool = computed(function () {
+        return book.value === ALL
+          ? CHARACTERS.slice()
+          : CHARACTERS.filter(function (c) { return c.book === book.value; });
+      });
+
+      var drawnNames = computed(function () {
+        var s = {};
+        history.value.forEach(function (h) { s[h.name] = true; });
+        return s;
+      });
+
+      var pool = computed(function () {
+        if (!noRepeat.value) return basePool.value;
+        return basePool.value.filter(function (c) { return !drawnNames.value[c.name]; });
+      });
+
+      var collectedCount = computed(function () { return Object.keys(drawnNames.value).length; });
+      var progressPct = computed(function () {
+        return Math.round(collectedCount.value / CHARACTERS.length * 1000) / 10;
+      });
+
+      /* ---- 方法 ---- */
+      function tierInfo(t) { return TIERS[t] || TIERS[1]; }
+
+      function tierCount(t) {
+        return history.value.filter(function (h) { return h.tier === t; }).length;
+      }
+      function tierPct(t) {
+        var max = 1;
+        Object.keys(TIERS).forEach(function (k) { max = Math.max(max, tierCount(+k)); });
+        return Math.round(tierCount(t) / max * 100);
+      }
+
+      function pickOne(list) {
+        var byTier = {};
+        list.forEach(function (c) { (byTier[c.tier] = byTier[c.tier] || []).push(c); });
+        var tiers = Object.keys(byTier).map(Number);
+        var total = 0;
+        tiers.forEach(function (t) { total += TIERS[t].weight; });
+        var r = Math.random() * total;
+        for (var i = 0; i < tiers.length; i++) {
+          r -= TIERS[tiers[i]].weight;
+          if (r <= 0) {
+            var group = byTier[tiers[i]];
+            return group[Math.floor(Math.random() * group.length)];
+          }
+        }
+        return list[Math.floor(Math.random() * list.length)];
+      }
+
+      function resetSticks() {
+        rattling.value = false;
+        pulling.value = false;
+        picked.value = -1;
+      }
+
+      function draw() {
+        if (drawing.value) return;
+        var list = pool.value;
+        if (!list.length) {
+          toast('warning', '签筒已空，请先重置签录或更换签谱');
+          return;
+        }
+
+        drawing.value = true;
+        result.value = null;
+        resetSticks();
+
+        /* 一、摇筒 */
+        rattling.value = true;
+        playClatter(sound.value);
+        vibe([10, 30, 16]);
+
+        wait(function () {
+          rattling.value = false;
+
+          /* 二、抽出一支 */
+          pulling.value = true;
+          picked.value = sticks.value.length ? Math.floor(Math.random() * sticks.value.length) : -1;
+
+          wait(function () {
+            /* 三、开签 */
+            var c = pickOne(list);
+            var item = {
+              id: uid(),
+              name: c.name,
+              book: c.book,
+              role: c.role,
+              arts: c.arts,
+              quote: c.quote,
+              tier: c.tier,
+              time: nowText(),
+              no: history.value.length + 1
+            };
+            result.value = item;
+            revealKey.value++;
+            history.value = [item].concat(history.value);
+            playChime(sound.value);
+            vibe([26]);
+            drawing.value = false;
+
+            /* 累计战绩：天机签提醒 + 连摇计数 */
+            streakCount.value = streakCount.value + 1;
+            if (item.tier > maxTierSeen.value) {
+              maxTierSeen.value = item.tier;
+              if (item.tier >= 5) {
+                wait(function () { toast('success', '天机签降世，' + item.name + ' 与你有一面之缘'); }, 320);
+              }
+            }
+            if (streakCount.value === 5) {
+              wait(function () { toast('info', '已连摇 5 签，缘分颇深'); }, 480);
+            } else if (streakCount.value === 20) {
+              wait(function () { toast('info', '已连摇 20 签，可稍歇再续'); }, 480);
+            }
+
+            if (noRepeat.value && !pool.value.length) {
+              wait(function () { toast('info', '签筒已空，此谱中人物尽收签录'); }, 900);
+            }
+          }, 470);
+        }, 900);
+      }
+
+      /* ---- 落盘：记录与偏好 ---- */
+      watch([history, book, noRepeat, sound, streakCount, maxTierSeen], function () {
+        saveStore({
+          history: history.value,
+          book: book.value,
+          noRepeat: noRepeat.value,
+          sound: sound.value,
+          streakCount: streakCount.value,
+          maxTierSeen: maxTierSeen.value
+        });
+      }, { deep: true });
+
+      /* ---- 键盘：空格 / N 摇签；Esc 关弹窗 ---- */
+      function onKey(e) {
+        var el = e.target;
+        var tag = (el && el.tagName) || '';
+        var inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (el && el.isContentEditable);
+
+        if (!inField && (e.key === 'Escape' || e.code === 'Escape')) {
+          if (detailVisible.value) detailVisible.value = false;
+          else if (resetVisible.value) resetVisible.value = false;
+          return;
+        }
+        if (inField) return;
+
+        if (e.code === 'Space' || e.key === ' ' ||
+            (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'n' || e.key === 'N'))) {
+          e.preventDefault();
+          draw();
+        }
+      }
+
+      onMounted(function () { window.addEventListener('keydown', onKey); });
+      onUnmounted(function () {
+        window.removeEventListener('keydown', onKey);
+        timers.forEach(function (t) { window.clearTimeout(t); });
+      });
+
+      return {
+        sticks: sticks,
+        rattling: rattling,
+        pulling: pulling,
+        picked: picked,
+        drawing: drawing,
+        result: result,
+        revealKey: revealKey,
+        history: history,
+        book: book,
+        noRepeat: noRepeat,
+        sound: sound,
+        detailVisible: detailVisible,
+        detail: detail,
+        resetVisible: resetVisible,
+        streakCount: streakCount,
+        maxTierSeen: maxTierSeen,
+        dailyPoem: dailyPoem,
+        characters: CHARACTERS,
+        bookOptions: BOOK_OPTIONS,
+        pool: pool,
+        collectedCount: collectedCount,
+        progressPct: progressPct,
+        tierInfo: tierInfo,
+        tierCount: tierCount,
+        tierPct: tierPct,
+        cnNum: cnNum,
+        bookFull: bookFull,
+        draw: draw,
+        tubeTap: tubeTap,
+        openDetail: function (it) { detail.value = it; detailVisible.value = true; },
+        removeOne: function (it) {
+          history.value = history.value.filter(function (h) { return h.id !== it.id; });
+          toast('success', '已撤去「' + it.name + '」这一签');
+        },
+        openReset: function () { resetVisible.value = true; },
+        doReset: function () {
+          history.value = [];
+          streakCount.value = 0;
+          maxTierSeen.value = 0;
+          result.value = null;
+          resetSticks();
+          resetVisible.value = false;
+          toast('success', '签筒已重新满签');
+        },
+        copyRecords: function () {
+          if (!history.value.length) { toast('warning', '签录尚空，无可抄录'); return; }
+          var lines = ['— 江湖签 · 签单 —', ''];
+          history.value.slice().reverse().forEach(function (h, i) {
+            lines.push((i + 1) + '. ' + h.name + '（' + tierInfo(h.tier).name + '·' + tierInfo(h.tier).label + '） 《' + h.book + '》 - ' + h.time);
+          });
+          var txt = lines.join('\n');
+          try {
+            window.navigator.clipboard.writeText(txt).then(function () {
+              toast('success', '签单已抄入剪贴板');
+            }, function () { toast('error', '抄录失败，请手动复制'); });
+          } catch (e) { toast('error', '当前环境不支持剪贴板'); }
+        },
+        exportTxt: function () {
+          if (!history.value.length) { toast('warning', '签录尚空，无可导出'); return; }
+          var lines = [];
+          lines.push('江湖签 · 签单');
+          lines.push('导出时间：' + nowText());
+          lines.push('共 ' + history.value.length + ' 签');
+          lines.push('');
+          history.value.slice().reverse().forEach(function (h, i) {
+            lines.push((i + 1) + '. ' + h.name + '（' + tierInfo(h.tier).name + '·' + tierInfo(h.tier).label + '）');
+            lines.push('   出处：《' + h.book + '》');
+            lines.push('   身份：' + h.role);
+            lines.push('   绝技：' + h.arts);
+            lines.push('   签语：' + h.quote);
+            lines.push('   落签：' + h.time);
+            lines.push('');
+          });
+          var blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = '江湖签_' + new Date().toISOString().slice(0, 10) + '.txt';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          toast('success', '签单已落盘为文本文件');
+        },
+        drawAgainFromDetail: function () {
+          if (drawing.value) return;
+          detailVisible.value = false;
+          // 留点时间让关闭动画播完再摇签
+          wait(function () { draw(); }, 160);
+        }
+      };
+    }
+  });
+
+  /* 内联 SVG 图标 */
+  app.component('i-icon', {
+    props: { name: { type: String, required: true } },
+    template: '<svg class="i" aria-hidden="true"><use :href="\'#ic-\' + name"></use></svg>'
+  });
+
+  /* 注册 TDesign：优先插件安装，失败时逐个注册具名组件兜底 */
+  var tdesign = TDesign && TDesign['default'] ? TDesign['default'] : TDesign;
+  var installed = false;
+  try {
+    if (tdesign && typeof tdesign.install === 'function') { app.use(tdesign); installed = true; }
+  } catch (e) { installed = false; }
+
+  if (!installed) {
+    Object.keys(TDesign).forEach(function (key) {
+      var comp = TDesign[key];
+      var target = comp && comp.default ? comp.default : comp;
+      var name = target && target.name;
+      if (typeof name === 'string' && name.charAt(0) === 'T') {
+        try { app.component(name, target); } catch (e) { }
+      }
+    });
+  }
+
+  app.mount('#app');
+  var rootEl = document.getElementById('app');
+  if (rootEl) rootEl.removeAttribute('v-cloak');
+})();
+</script>
+</body>
+</html>
