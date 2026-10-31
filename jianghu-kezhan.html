@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>江湖客栈 · 黑金因果录</title>
+<link rel="stylesheet" href="libs/tdesign.min.css"
+      onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/tdesign-vue-next@1.20.7/dist/tdesign.min.css'" />
+<script src="libs/vue.global.prod.js"></script>
+<script>if(!window.Vue)document.write('<script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"><\/script>')</script>
+<script src="libs/tdesign.min.js"></script>
+<script>if(!window.TDesign)document.write('<script src="https://cdn.jsdelivr.net/npm/tdesign-vue-next@1.20.7/dist/tdesign.min.js"><\/script>')</script>
+<style>
+/* =========================================================
+   黑金 · 江湖客栈（宣纸浅底 · 水墨风）
+   ========================================================= */
+:root{
+  --bg:#F8F6F0;
+  --panel:#FFFFFF;
+  --panel-2:#FDFCF7;
+  --line:rgba(140,110,40,.18);
+  --line-2:rgba(140,110,40,.38);
+  --gold:#B08A2E;
+  --gold-hi:#8A6D1C;
+  --gold-dim:#B3A06A;
+  --ink:#26221A;
+  --ink-2:#6E6752;
+  --ink-3:#9B9480;
+  --red:#B04A42;
+
+  --font-song:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun","宋体",serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+
+  /* TDesign 对齐黑金（浅底） */
+  --td-brand-color:#B08A2E;
+  --td-brand-color-hover:#C9A43A;
+  --td-brand-color-active:#8A6D1C;
+  --td-brand-color-focus:rgba(176,138,46,.16);
+  --td-brand-color-light:rgba(176,138,46,.08);
+  --td-brand-color-light-hover:rgba(176,138,46,.14);
+  --td-bg-color-container:#FFFFFF;
+  --td-bg-color-container-hover:#F6F3EA;
+  --td-bg-color-container-active:#F1EDE1;
+  --td-bg-color-secondarycontainer:#F6F3EA;
+  --td-text-color-primary:#26221A;
+  --td-text-color-secondary:#6E6752;
+  --td-text-color-placeholder:#9B9480;
+  --td-border-level-1-color:rgba(140,110,40,.18);
+  --td-border-level-2-color:rgba(140,110,40,.36);
+  --td-radius-default:6px;
+  --td-font-family:var(--font-song);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[v-cloak]{display:none !important}
+html,body{min-height:100%}
+body{
+  font-family:var(--font-song);
+  color:var(--ink);
+  background:
+    radial-gradient(80% 46% at 50% -10%, rgba(64,58,42,.06), transparent 62%),
+    radial-gradient(46% 32% at 98% 104%, rgba(90,80,58,.07), transparent 60%),
+    radial-gradient(38% 28% at 0% 90%, rgba(176,138,46,.05), transparent 58%),
+    var(--bg);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::after{ /* 宣纸噪点 */
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;mix-blend-mode:multiply;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='260' height='260' filter='url(%23n)' opacity='0.5'/></svg>");
+}
+::selection{background:rgba(176,138,46,.85);color:#FFFCF2}
+button{font-family:inherit}
+
+/* 浮尘（水墨） */
+.motes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.mote{position:absolute;bottom:-8px;border-radius:50%;
+  background:radial-gradient(circle at 40% 40%, rgba(70,64,48,.5), rgba(70,64,48,.03) 72%);
+  animation:moteUp linear infinite}
+@keyframes moteUp{
+  0%{transform:translate3d(0,0,0) scale(.6);opacity:0}
+  12%{opacity:.4}
+  82%{opacity:.16}
+  100%{transform:translate3d(26px,-108vh,0) scale(1.1);opacity:0}
+}
+
+/* 水墨远山 */
+.ink-layer{position:fixed;left:0;right:0;bottom:0;height:32vh;pointer-events:none;z-index:0;overflow:hidden}
+.ink-layer svg{position:absolute;left:0;bottom:0;width:100%;height:100%;display:block}
+
+/* ---------------- 通用 ---------------- */
+.gold-text{
+  background:linear-gradient(178deg,#6E5613 8%,#A9862A 46%,#5C4A10 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hr-gold{height:1px;background:linear-gradient(90deg,transparent,var(--line-2),transparent)}
+.i{display:inline-block;width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.9;
+   stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.12em}
+
+.btn-gold{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 30px;border:0;cursor:pointer;font-size:15px;letter-spacing:3px;
+  font-family:var(--font-song);color:#1B180E;font-weight:700;
+  background:linear-gradient(160deg,#EED896 0%,#C9A43A 46%,#A9862A 100%);
+  clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);
+  transition:filter .2s var(--ease),transform .2s var(--ease);
+}
+.btn-gold:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 18px;cursor:pointer;
+  border:1px solid var(--line-2);background:rgba(176,138,46,.05);color:var(--gold-hi);
+  font-size:13px;letter-spacing:1px;transition:all .18s var(--ease);
+  clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,7px 100%,0 50%);
+}
+.btn-ghost:hover{background:rgba(176,138,46,.13);border-color:var(--gold)}
+
+/* ---------------- 开局 ---------------- */
+.intro{position:relative;z-index:2;min-height:100vh;display:grid;place-items:center;padding:32px 18px}
+.intro-card{width:min(660px,100%);text-align:center;animation:fadeUp .7s var(--ease) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.intro-frame{
+  position:relative;padding:52px 40px 44px;
+  background:linear-gradient(175deg,#FFFEFA 0%,#F9F4E8 100%);
+  border:1px solid var(--line-2);
+  box-shadow:0 36px 90px -36px rgba(74,62,28,.35),inset 0 1px 0 rgba(255,255,255,.7);
+}
+.intro-frame::before,.intro-frame::after,
+.intro-frame .cor::before,.intro-frame .cor::after{
+  content:"";position:absolute;width:22px;height:22px;border:1px solid var(--gold);opacity:.85}
+.intro-frame::before{left:-5px;top:-5px;border-right:0;border-bottom:0}
+.intro-frame::after{right:-5px;top:-5px;border-left:0;border-bottom:0}
+.intro-frame .cor::before{left:-5px;bottom:-5px;border-right:0;border-top:0}
+.intro-frame .cor::after{right:-5px;bottom:-5px;border-left:0;border-top:0}
+.intro-seal{
+  position:absolute;right:26px;top:22px;width:58px;height:58px;display:grid;place-items:center;
+  font-size:30px;color:#A9862A;border:2px solid rgba(169,134,42,.55);border-radius:6px;
+  transform:rotate(8deg);font-weight:700;opacity:.9;letter-spacing:0;
+}
+.intro-kicker{font-size:12px;letter-spacing:10px;color:var(--ink-3);text-indent:10px}
+.intro-title{font-size:64px;font-weight:700;letter-spacing:16px;text-indent:16px;line-height:1.25;margin:14px 0 6px}
+.intro-sub{font-size:14px;letter-spacing:6px;color:var(--gold-hi);text-indent:6px}
+.intro-line{display:flex;align-items:center;gap:14px;margin:26px 0}
+.intro-line i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line-2))}
+.intro-line i:last-child{background:linear-gradient(90deg,var(--line-2),transparent)}
+.intro-line span{font-size:12px;letter-spacing:4px;color:var(--ink-3)}
+.intro-form{display:flex;flex-direction:column;gap:20px;text-align:left}
+.fld{display:flex;flex-direction:column;gap:9px}
+.fld-label{font-size:13px;color:var(--ink-2);letter-spacing:3px;display:flex;align-items:center;gap:8px}
+.fld-label::before{content:"";width:14px;height:1px;background:var(--gold)}
+.gender-pick{display:flex;gap:12px}
+.g-opt{
+  flex:1;padding:12px 0;text-align:center;cursor:pointer;font-size:15px;letter-spacing:4px;
+  border:1px solid var(--line);background:rgba(176,138,46,.03);color:var(--ink-2);
+  transition:all .2s var(--ease)
+}
+.g-opt:hover{border-color:var(--line-2);color:var(--gold-hi)}
+.g-opt.active{border-color:var(--gold);color:#6E5613;background:rgba(176,138,46,.1);
+  box-shadow:inset 0 0 18px rgba(176,138,46,.08),0 4px 14px rgba(176,138,46,.14)}
+.intro-tip{margin-top:22px;font-size:12px;line-height:2;color:var(--ink-3);letter-spacing:1px}
+
+/* ---------------- 经营布局 ---------------- */
+.game{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:20px 18px 40px;min-height:100vh;display:flex;flex-direction:column;gap:16px}
+
+.topbar{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:16px 22px;background:linear-gradient(175deg,#FFFFFF,#FBF8F0);
+  border:1px solid var(--line);box-shadow:0 16px 40px -26px rgba(74,62,28,.32)
+}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.brand-text{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.brand-text strong{font-size:19px;letter-spacing:5px}
+.brand-text span{font-size:11px;letter-spacing:2px;color:var(--ink-3)}
+
+.stats{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto}
+.stat{
+  display:flex;align-items:center;gap:9px;padding:8px 15px;
+  background:rgba(176,138,46,.05);border:1px solid var(--line);font-size:13px;color:var(--ink-2)
+}
+.stat .i{font-size:16px;color:var(--gold)}
+.stat b{font-size:16px;color:var(--gold-hi);font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:1px}
+.stat small{font-size:10px;color:var(--ink-3);letter-spacing:2px}
+.stat.warn b{color:var(--red)}
+.top-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+.layout{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 318px;gap:16px;align-items:start}
+
+/* ---------------- 客堂 ---------------- */
+.hall{
+  min-height:560px;display:flex;flex-direction:column;
+  background:linear-gradient(175deg,#FFFFFF,#FBF8F0);
+  border:1px solid var(--line);box-shadow:0 24px 60px -34px rgba(74,62,28,.35);
+  position:relative;overflow:hidden
+}
+.hall::before{content:"宿";position:absolute;right:-16px;bottom:-42px;font-size:220px;
+  color:rgba(64,58,42,.05);font-weight:700;pointer-events:none;line-height:1}
+.hall-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line)}
+.hall-head .i{font-size:17px;color:var(--gold)}
+.hall-head h2{font-size:16px;letter-spacing:5px;color:var(--gold-hi);font-weight:600}
+.hall-head .step-dots{margin-left:auto;display:flex;gap:6px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(140,110,40,.2);transition:all .3s var(--ease)}
+.dot.on{background:var(--gold);box-shadow:0 0 0 3px rgba(176,138,46,.15)}
+.dot-lab{font-size:11px;color:var(--ink-3);letter-spacing:2px;margin-right:4px}
+
+.idle{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 24px;text-align:center}
+.idle-lantern{
+  width:66px;height:66px;color:var(--gold);fill:none;stroke:currentColor;
+  stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 10px 22px rgba(176,138,46,.35));
+  animation:breath 4s var(--ease) infinite alternate
+}
+@keyframes breath{from{opacity:.6;transform:scale(.96)}to{opacity:1;transform:scale(1.04)}}
+.idle-title{font-size:24px;letter-spacing:8px}
+.idle-sub{font-size:13px;color:var(--ink-3);letter-spacing:2px;line-height:2;max-width:420px}
+
+/* 客人卡 */
+.guest{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:flex-start;animation:fadeUp .5s var(--ease) both}
+.g-ava{
+  width:52px;height:52px;flex:none;display:grid;place-items:center;font-size:22px;font-weight:700;
+  color:#6E5613;background:radial-gradient(circle at 34% 30%,rgba(176,138,46,.16),rgba(176,138,46,.03));
+  border:1px solid var(--line-2);border-radius:50%;letter-spacing:0
+}
+.g-body{min-width:0;flex:1}
+.g-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.g-name{font-size:17px;color:var(--ink);letter-spacing:2px;font-weight:700}
+.g-tag{font-size:10px;letter-spacing:2px;color:var(--gold-hi);border:1px solid var(--line-2);padding:2px 9px}
+.g-desc{font-size:13px;color:var(--ink-3);margin-top:6px;line-height:1.8;letter-spacing:.5px}
+
+/* 对话 */
+.chat{flex:1;min-height:220px;max-height:400px;overflow-y:auto;padding:18px 20px;scrollbar-width:thin}
+.chat::-webkit-scrollbar{width:7px}
+.chat::-webkit-scrollbar-thumb{background:rgba(140,110,40,.24);border-radius:6px}
+.lg{margin-bottom:16px;animation:lgIn .4s var(--ease) both}
+@keyframes lgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.lg-narr{font-size:13px;color:var(--ink-3);line-height:1.9;letter-spacing:.5px;padding:2px 6px}
+.lg-g{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.lg-g .who{font-size:11px;color:var(--gold-hi);letter-spacing:2px}
+.lg-g .bub{max-width:88%;background:#F6F3E9;border-left:2px solid var(--gold-dim);
+  padding:9px 14px;font-size:14px;line-height:1.9;letter-spacing:.5px;color:var(--ink)}
+.lg-y{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.lg-y .who{font-size:11px;color:var(--ink-3);letter-spacing:2px}
+.lg-y .bub{max-width:88%;background:rgba(176,138,46,.09);border-right:2px solid var(--gold);
+  padding:9px 14px;font-size:14px;line-height:1.9;letter-spacing:.5px;color:#6E5613}
+.lg-sys{margin:6px 0;padding:13px 16px;font-size:13.5px;line-height:1.9;letter-spacing:.5px;
+  color:#7E6317;background:rgba(176,138,46,.06);border:1px dashed var(--line-2)}
+.lg-sys.bad{color:#9C4A43;background:rgba(176,74,66,.05);border-color:rgba(176,74,66,.35)}
+.lg-sys .delta{font-weight:700;letter-spacing:1px}
+
+/* 选项 */
+.opts{padding:16px 20px 20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.opt{
+  display:flex;flex-direction:column;gap:5px;text-align:left;padding:12px 16px;cursor:pointer;
+  background:#FFFDF8;border:1px solid var(--line);color:var(--ink);
+  font-size:14px;letter-spacing:1px;transition:all .18s var(--ease)
+}
+.opt:hover{border-color:var(--gold);background:rgba(176,138,46,.05);transform:translateX(4px)}
+.opt-hint{font-size:11.5px;color:var(--ink-3);letter-spacing:1px;line-height:1.6}
+.opt-danger{border-color:rgba(176,74,66,.3)}
+.opt-danger:hover{border-color:var(--red);background:rgba(176,74,66,.05)}
+.opt-danger .opt-label{color:#9C4A43}
+.send-off{padding:14px 20px 22px;display:flex;justify-content:center}
+
+/* ---------------- 侧栏 ---------------- */
+.side{display:flex;flex-direction:column;gap:16px;position:sticky;top:20px}
+.side-card{background:linear-gradient(175deg,#FFFFFF,#FBF8F0);border:1px solid var(--line);padding:16px 18px}
+.side-title{display:flex;align-items:center;gap:9px;font-size:13px;letter-spacing:4px;color:var(--gold-hi);margin-bottom:13px}
+.side-title .i{font-size:15px;color:var(--gold)}
+.buffs{display:flex;flex-direction:column;gap:9px}
+.buff{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:rgba(176,138,46,.05);border:1px solid var(--line)}
+.buff .i{font-size:16px;color:var(--gold);margin-top:2px}
+.buff b{display:block;font-size:13px;color:var(--gold-hi);letter-spacing:2px;margin-bottom:3px}
+.buff span{font-size:11.5px;color:var(--ink-3);line-height:1.7;letter-spacing:.5px}
+.buff.none{border-style:dashed;color:var(--ink-3)}
+.logs{display:flex;flex-direction:column;gap:2px;max-height:380px;overflow-y:auto;scrollbar-width:thin}
+.logs::-webkit-scrollbar{width:6px}
+.logs::-webkit-scrollbar-thumb{background:rgba(140,110,40,.22);border-radius:6px}
+.logit{padding:8px 2px;border-bottom:1px dashed rgba(140,110,40,.16);font-size:12px;line-height:1.8;color:var(--ink-2);letter-spacing:.5px}
+.logit em{font-style:normal;color:var(--gold-dim);font-size:10.5px;letter-spacing:1px;margin-right:6px}
+.logit.bad{color:#9C4A43}
+.logit.good{color:#8A6D1C}
+
+/* ---------------- 结局 ---------------- */
+.endwrap{position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:26px;
+  background:radial-gradient(60% 50% at 50% 42%,rgba(176,138,46,.12),transparent 70%),rgba(248,246,240,.96);
+  backdrop-filter:blur(10px);overflow-y:auto}
+.end-card{width:min(680px,100%);text-align:center;padding:54px 44px 44px;position:relative;
+  background:linear-gradient(175deg,#FFFEFA,#F7F2E3);border:1px solid var(--line-2);
+  box-shadow:0 60px 130px -50px rgba(74,62,28,.5);animation:fadeUp .8s var(--ease) both}
+.end-card::before,.end-card::after{content:"";position:absolute;width:26px;height:26px;border:1px solid var(--gold)}
+.end-card::before{left:-6px;top:-6px;border-right:0;border-bottom:0}
+.end-card::after{right:-6px;bottom:-6px;border-left:0;border-top:0}
+.end-no{font-size:12px;letter-spacing:8px;color:var(--ink-3);text-indent:8px}
+.end-title{font-size:52px;letter-spacing:14px;text-indent:14px;margin:18px 0 10px;font-weight:700}
+.end-rule{display:flex;align-items:center;gap:14px;margin:8px auto 26px;max-width:340px}
+.end-rule i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line-2))}
+.end-rule i:last-child{background:linear-gradient(90deg,var(--line-2),transparent)}
+.end-rule span{font-size:11px;letter-spacing:6px;color:var(--gold-hi);text-indent:6px}
+.end-text{font-size:14.5px;line-height:2.3;color:var(--ink-2);letter-spacing:1px;text-align:left;white-space:pre-line}
+.end-text::first-letter{color:var(--gold-hi)}
+.end-stats{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:30px 0 8px}
+.end-stat{padding:10px 20px;background:rgba(176,138,46,.05);border:1px solid var(--line)}
+.end-stat b{display:block;font-size:19px;color:var(--gold-hi);letter-spacing:1px;font-variant-numeric:tabular-nums}
+.end-stat span{font-size:10.5px;color:var(--ink-3);letter-spacing:3px}
+
+/* 成就浮层 */
+.ach-mask{position:fixed;inset:0;z-index:3200;display:grid;place-items:center;padding:24px;
+  background:rgba(248,246,240,.92);backdrop-filter:blur(8px)}
+.ach-card{width:min(480px,100%);text-align:center;padding:46px 36px;position:relative;overflow:hidden;
+  background:linear-gradient(175deg,#FFFDF5,#F7EFDC);border:1px solid var(--gold);
+  box-shadow:0 0 80px rgba(176,138,46,.22),0 40px 80px -40px rgba(74,62,28,.4);animation:achIn .6s var(--ease) both}
+@keyframes achIn{from{opacity:0;transform:scale(.86) translateY(20px)}to{opacity:1;transform:none}}
+.ach-card::before{content:"";position:absolute;inset:-40%;background:conic-gradient(from 0deg,
+  transparent 0 12%,rgba(176,138,46,.1) 16% 18%,transparent 22% 40%,rgba(176,138,46,.08) 44% 46%,transparent 50% 100%);
+  animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ach-inner{position:relative}
+.ach-star{font-size:54px;color:var(--gold);filter:drop-shadow(0 4px 16px rgba(176,138,46,.5));animation:breath 2.6s var(--ease) infinite alternate}
+.ach-kicker{font-size:11px;letter-spacing:8px;color:var(--gold-hi);margin-top:12px;text-indent:8px}
+.ach-title{font-size:38px;letter-spacing:12px;text-indent:12px;margin:10px 0 14px;font-weight:700}
+.ach-text{font-size:13.5px;color:var(--ink-2);line-height:2;letter-spacing:1px}
+
+/* TDesign 浅色微调 */
+.t-dialog{background:#FFFEF9 !important;border:1px solid var(--line-2) !important;
+  box-shadow:0 40px 100px -40px rgba(74,62,28,.45) !important}
+.t-dialog__header-content{color:var(--gold-hi) !important;letter-spacing:3px}
+.t-dialog__body{color:var(--ink-2) !important;line-height:2.1;letter-spacing:.5px;white-space:pre-line}
+.t-dialog__footer .t-button--variant-outline{border-color:var(--line-2)}
+.t-input{background:#FFFFFF !important;border-color:var(--line-2) !important}
+.t-input .t-input__inner{color:var(--ink) !important;font-family:var(--font-song)}
+.t-input--focused{border-color:var(--gold) !important;box-shadow:0 0 0 2px rgba(176,138,46,.15) !important}
+.t-button--theme-primary.t-button--variant-base{color:#1B180E !important;font-weight:700}
+.t-popconfirm .t-popconfirm__content{color:var(--ink-2)}
+
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr}
+  .side{position:static}
+  .intro-title{font-size:44px;letter-spacing:9px}
+  .stats{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<!-- 图标精灵 -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ic-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1 1.1-1.7 2.5-1.7s2.5.7 2.5 1.7-1.1 1.6-2.5 1.9-2.5.9-2.5 1.9 1.1 1.7 2.5 1.7 2.5-.7 2.5-1.7"/></symbol>
+  <symbol id="ic-pulse" viewBox="0 0 24 24"><path d="M22 12h-4l-3 8.5L9 3.5 6 12H2"/></symbol>
+  <symbol id="ic-medal" viewBox="0 0 24 24"><circle cx="12" cy="14.5" r="5.5"/><path d="M8.5 9.5 6 2h12l-2.5 7.5M12 12.5l.9 1.9 2.1.3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2-1.5-1.4 2.1-.3z"/></symbol>
+  <symbol id="ic-users" viewBox="0 0 24 24"><path d="M16 20v-1.6a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V20"/><circle cx="9" cy="7.5" r="3.6"/><path d="M22 20v-1.6a4 4 0 0 0-3-3.87M16.5 4.1a4 4 0 0 1 0 6.8"/></symbol>
+  <symbol id="ic-scroll" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v1h5M8 3v15a3 3 0 0 0 3 3h6a4 4 0 0 0 4-4V6a3 3 0 0 0-3-3h-7Z"/><path d="M11 9h6M11 13h6"/></symbol>
+  <symbol id="ic-door" viewBox="0 0 24 24"><path d="M16 3H8a2 2 0 0 0-2 2v16h12V5a2 2 0 0 0-2-2Z"/><path d="M18 21h-4M14 21V3M11 12h.01"/></symbol>
+  <symbol id="ic-shield" viewBox="0 0 24 24"><path d="M12 22s8-3.6 8-10V5.5L12 2 4 5.5V12c0 6.4 8 10 8 10Z"/><path d="m9 11.5 2 2 4-4.5"/></symbol>
+  <symbol id="ic-flame" viewBox="0 0 24 24"><path d="M12 22c4.4 0 7-2.8 7-6.5 0-3-1.8-4.6-3-6.5-.5 2-1.5 2.6-2.5 3-.2-2.9-1.5-6.2-4-8 .3 3.2-1 4.6-2.3 6.2C5.9 11.8 5 13 5 15.5 5 19.2 7.6 22 12 22Z"/><path d="M12 22c-1.9 0-3-1.3-3-3 0-1.5 1-2.3 2-3.7.4 1 1 1.3 1.6 1.5.9-1 1.4-1.8 1.4-3.3 1.5 1.2 3 2.9 3 5.5 0 1.7-1.1 3-3 3Z" stroke-width="0" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="ic-moon" viewBox="0 0 24 24"><path d="M20.4 14.2A8.5 8.5 0 0 1 9.8 3.6a8.5 8.5 0 1 0 10.6 10.6Z"/></symbol>
+  <symbol id="ic-lantern" viewBox="0 0 24 24">
+    <path d="M12 1.8v1.7"/>
+    <path d="M8.6 3.5h6.8"/>
+    <path d="M9.4 3.5c-2.1 2.3-2.8 4.8-2.8 8.5s.7 6.2 2.8 8.5"/>
+    <path d="M14.6 3.5c2.1 2.3 2.8 4.8 2.8 8.5s-.7 6.2-2.8 8.5"/>
+    <path d="M9.4 20.5h5.2"/>
+    <path d="M12 20.5v1.7"/>
+    <path d="M10.5 6.4c-.55 1.8-.55 11.4 0 13.2M13.5 6.4c.55 1.8.55 11.4 0 13.2"/>
+  </symbol>
+</svg>
+
+<div class="motes" aria-hidden="true">
+  <span v-for="m in motes" :key="m.i" class="mote"
+        :style="{left:m.left+'%',width:m.s+'px',height:m.s+'px',animationDuration:m.d+'s',animationDelay:m.delay+'s'}"></span>
+</div>
+
+<!-- 水墨远山 -->
+<div class="ink-layer" aria-hidden="true">
+  <svg viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice">
+    <path d="M-40 300 L-40 208 Q60 118 150 178 Q230 226 300 192 Q392 148 470 212 Q530 258 600 226 L640 300 Z" fill="rgba(58,54,44,.05)"/>
+    <path d="M-40 300 L-40 254 Q90 200 190 240 Q290 276 380 250 Q470 222 560 252 L620 300 Z" fill="rgba(58,54,44,.035)"/>
+    <path d="M1480 300 L1480 190 Q1358 96 1262 160 Q1170 220 1078 178 Q1000 142 918 196 L860 300 Z" fill="rgba(58,54,44,.055)"/>
+    <path d="M1480 300 L1480 250 Q1330 190 1220 238 Q1120 278 1020 254 L960 300 Z" fill="rgba(58,54,44,.035)"/>
+    <circle cx="1180" cy="80" r="34" fill="none" stroke="rgba(58,54,44,.12)" stroke-width="1.5"/>
+  </svg>
+</div>
+
+<div id="app" v-cloak>
+
+  <!-- ============ 开局 ============ -->
+  <div v-if="S.screen==='intro'" class="intro">
+    <div class="intro-card">
+      <div class="intro-frame"><i class="cor"></i>
+        <div class="intro-seal">客</div>
+        <p class="intro-kicker">黑 金 因 果 录</p>
+        <h1 class="intro-title gold-text">江湖客栈</h1>
+        <p class="intro-sub">一间客栈 · 三位故人 · 五种结局</p>
+        <div class="intro-line"><i></i><span>开 张</span><i></i></div>
+        <div class="intro-form">
+          <div class="fld">
+            <label class="fld-label">掌柜名号</label>
+            <t-input v-model="form.name" size="large" maxlength="12" clearable
+                     placeholder="报上名号，江湖好称呼" @enter="startGame"></t-input>
+          </div>
+          <div class="fld">
+            <label class="fld-label">性别</label>
+            <div class="gender-pick">
+              <button type="button" class="g-opt" :class="{active:form.gender==='男'}" @click="form.gender='男'">男 掌 柜</button>
+              <button type="button" class="g-opt" :class="{active:form.gender==='女'}" @click="form.gender='女'">女 掌 柜</button>
+            </div>
+          </div>
+          <button class="btn-gold" style="margin-top:6px" :disabled="starting"
+                  :style="starting ? 'opacity:.65;cursor:wait' : ''" @click="startGame">
+            <svg class="i"><use href="#ic-door"/></svg>{{ starting ? '查 询 云 端 进 度 …' : '开 门 迎 客' }}
+          </button>
+        </div>
+        <p class="intro-tip">
+          住店一晚五十文 · 摆宴一席三百文 · 遭劫损财两百文<br/>
+          谈话之间，可察言观色，亦可诱导人心——只是江湖险恶，因果自负。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 经营 ============ -->
+  <div v-else-if="S.screen==='game'" class="game">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-text">
+          <strong class="gold-text">江湖客栈</strong>
+          <span>{{ S.name }} · {{ S.gender==='男' ? '掌柜' : '老板娘' }} · 黑金因果录</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat" title="银钱"><svg class="i"><use href="#ic-coin"/></svg><b>{{ S.money }}</b><small>文</small></div>
+        <div class="stat" :class="{warn:S.health<=40}" title="体质"><svg class="i"><use href="#ic-pulse"/></svg><b>{{ S.health }}</b><small>体质</small></div>
+        <div class="stat" title="声名"><svg class="i"><use href="#ic-medal"/></svg><b>{{ S.fame }}</b><small>声名</small></div>
+        <div class="stat" title="累计接待客人"><svg class="i"><use href="#ic-users"/></svg><b>{{ S.served }}</b><small>客</small></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn-ghost" @click="helpVisible=true">
+          <svg class="i"><use href="#ic-scroll"/></svg>玩法说明
+        </button>
+        <t-popconfirm content="进度将全部清空，确定重新开局？" theme="danger" @confirm="restart">
+          <button class="btn-ghost">重新开局</button>
+        </t-popconfirm>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- 客堂 -->
+      <section class="hall">
+        <div class="hall-head">
+          <svg class="i"><use href="#ic-flame"/></svg>
+          <h2>客 堂</h2>
+          <div class="step-dots" v-if="S.enc && S.enc.kind==='sp'">
+            <span class="dot-lab">谈话</span>
+            <span v-for="n in 5" :key="n" class="dot" :class="{on:n<=talkStep}"></span>
+          </div>
+          <div class="step-dots" v-else-if="S.enc">
+            <span class="dot-lab">交涉</span>
+            <span v-for="n in 2" :key="n" class="dot" :class="{on:n<=S.enc.step+1}"></span>
+          </div>
+        </div>
+
+        <!-- 无客 -->
+        <div v-if="!S.enc" class="idle">
+          <svg class="idle-lantern" aria-hidden="true"><use href="#ic-lantern"></use></svg>
+          <div class="idle-title gold-text">客 未 上 门</div>
+          <p class="idle-sub">
+            檐外风声渐紧，灯笼在暮色里晃。<br/>
+            这江湖上人来人往——第 <b style="color:var(--gold-hi)">{{ S.served + 1 }}</b> 位客人，正走向你的店门。
+          </p>
+          <button class="btn-gold" @click="nextCustomer">
+            <svg class="i"><use href="#ic-door"/></svg>开 门 迎 客
+          </button>
+        </div>
+
+        <!-- 有客 -->
+        <template v-else>
+          <div class="guest">
+            <div class="g-ava">{{ S.enc.name.charAt(0) }}</div>
+            <div class="g-body">
+              <div class="g-name-row">
+                <span class="g-name">{{ S.enc.name }}</span>
+                <span class="g-tag" v-if="S.enc.kind==='sp'">神秘客卿</span>
+              </div>
+              <p class="g-desc">{{ S.enc.desc }}</p>
+            </div>
+          </div>
+
+          <div class="chat" ref="chatBox">
+            <div v-for="(l,i) in S.enc.log" :key="i" class="lg" :class="'lg-'+l.w">
+              <template v-if="l.w==='g'"><span class="who">{{ S.enc.name }}</span><span class="bub">{{ l.t }}</span></template>
+              <template v-else-if="l.w==='y'"><span class="who">{{ S.name }}</span><span class="bub">{{ l.t }}</span></template>
+              <template v-else-if="l.w==='sys'"><div class="lg-sys" :class="{bad:l.bad}">{{ l.t }}</div></template>
+              <template v-else>{{ l.t }}</template>
+            </div>
+          </div>
+
+          <!-- 选项 -->
+          <div class="opts" v-if="nmOptions">
+            <button v-for="o in nmOptions" :key="o.key" class="opt" @click="chooseNm(o)">
+              <span class="opt-label">{{ o.label }}</span>
+              <span class="opt-hint" v-if="o.hint">{{ o.hint }}</span>
+            </button>
+          </div>
+          <div class="opts" v-else-if="spOptions">
+            <button v-for="(o,i) in spOptions" :key="i" class="opt" :class="{danger:o.danger}" @click="chooseSp(o)">
+              <span class="opt-label">{{ o.label }}</span>
+              <span class="opt-hint" v-if="o.hint">{{ o.hint }}</span>
+            </button>
+            <t-popconfirm v-if="S.enc.id==='yiyedao' && S.enc.step<4"
+                         content="不问故事，直接报官领八百文赏钱？" theme="danger" @confirm="sellYiyedaoNow">
+              <button class="opt opt-danger">
+                <span class="opt-label">悄悄差小二去报官 · 领八百文赏钱</span>
+                <span class="opt-hint">无需听她的故事，直接换钱——此路不会触发特殊结局</span>
+              </button>
+            </t-popconfirm>
+          </div>
+
+          <div class="send-off" v-if="encDone">
+            <button class="btn-ghost" @click="seeOff">送客 · 打烊</button>
+          </div>
+        </template>
+      </section>
+
+      <!-- 侧栏 -->
+      <aside class="side">
+        <div class="side-card">
+          <div class="side-title"><svg class="i"><use href="#ic-shield"/></svg>店 中 状 态</div>
+          <div class="buffs">
+            <div class="buff" v-if="S.flags.stay">
+              <svg class="i"><use href="#ic-shield"/></svg>
+              <div><b>飞霜雪 · 坐镇</b><span>白发女子守在柜后，打劫之事必被她悄然化解。</span></div>
+            </div>
+            <div class="buff" v-if="S.flags.train">
+              <svg class="i"><use href="#ic-flame"/></svg>
+              <div><b>暗器 · 声名大噪</b><span>得飞霜雪珍藏暗器压店，声名远播——摆宴更易说动，且每隔两位客人收到她寄来的一百文。</span></div>
+            </div>
+            <div class="buff" v-if="S.flags.beads">
+              <svg class="i"><use href="#ic-moon"/></svg>
+              <div><b>佛珠 · 清心</b><span>玄定所赠佛珠悬于柜上，满堂清心——再无劫匪光顾，大鱼大肉的宴席也少了许多。</span></div>
+            </div>
+            <div class="buff none" v-if="!S.flags.stay && !S.flags.train && !S.flags.beads">
+              <div><b>平安无事</b><span>店中暂无特殊际遇。江湖夜长，且看明日的客。</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="side-card">
+          <div class="side-title"><svg class="i"><use href="#ic-scroll"/></svg>江 湖 见 闻</div>
+          <div class="logs">
+            <div v-if="!S.logs.length" class="logit" style="border:0">店门初开，尚无见闻。</div>
+            <div v-for="l in logsView" :key="l.id" class="logit" :class="l.tone">{{ l.t }}</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ============ 结局 ============ -->
+  <div v-else class="endwrap">
+    <div class="end-card">
+      <p class="end-no">特 殊 结 局 · {{ ending.no }}</p>
+      <h1 class="end-title gold-text">{{ ending.title }}</h1>
+      <div class="end-rule"><i></i><span>终</span><i></i></div>
+      <p class="end-text">{{ ending.text }}</p>
+      <div class="end-stats">
+        <div class="end-stat"><b>{{ S.served }}</b><span>接待客人</span></div>
+        <div class="end-stat"><b>{{ S.income }}</b><span>累计收入(文)</span></div>
+        <div class="end-stat"><b>{{ S.health }}</b><span>终时体质</span></div>
+      </div>
+      <div style="margin-top:26px">
+        <button class="btn-gold" @click="restart">再 开 一 店</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 事件弹窗 ============ -->
+  <t-dialog v-model:visible="evtVisible" :header="S.evt && S.evt.title" width="520px"
+            :footer="false" :close-on-overlay-click="false">
+    <div style="padding:4px 2px">{{ S.evt && S.evt.text }}</div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn-gold" @click="S.evt=null">收 下</button>
+    </div>
+  </t-dialog>
+
+  <!-- ============ 玩法说明 ============ -->
+  <t-dialog v-model:visible="helpVisible" header="玩法说明" width="560px" :footer="false">
+    <div style="line-height:2.15;font-size:13.5px">
+      <p><b style="color:var(--gold-hi)">· 普通客人</b>：每次交涉只有两轮对话。第一轮察言观色，可从言谈中察觉来者身份；第二轮再作决定。</p>
+      <p style="margin-top:8px"><b style="color:var(--gold-hi)">· 住店</b>收入五十文；<b style="color:#DBA39E">打劫</b>损失两百文、体质下降，若提前察觉并差小二报官（七成把握），损失可减至八十文；<b style="color:var(--gold-hi)">摆宴</b>获利三百文，也可在谈话中极力游说客人摆宴（七成把握）。</p>
+      <p style="margin-top:8px"><b style="color:var(--gold-hi)">· 神秘客卿</b>：前两位必是普通客人，第三位必是神秘客卿，此后每接待三位客人必有一位登门。神秘客卿有五轮谈话：前四轮试探，第五轮是根据前几轮所得作出的决定性抉择。</p>
+      <p style="margin-top:8px"><b style="color:var(--gold-hi)">· 结局</b>：财产归零即破产；累计收入过万成就「富甲一方」；三位客卿各自牵动三段因果……且行且珍惜。</p>
+    </div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="btn-ghost" @click="helpVisible=false">知道了</button>
+    </div>
+  </t-dialog>
+
+  <!-- ============ 成就 ============ -->
+  <div class="ach-mask" v-if="S.achShown">
+    <div class="ach-card">
+      <div class="ach-inner">
+        <div class="ach-star">✦</div>
+        <p class="ach-kicker">特 殊 成 就 · 其 五</p>
+        <h2 class="ach-title gold-text">富甲一方</h2>
+        <p class="ach-text">客栈累计收入突破一万文。<br/>江湖传言——这家客栈的掌柜，怕是藏了半座金山。</p>
+        <div style="margin-top:24px">
+          <button class="btn-gold" @click="S.achShown=false">继续经营</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  if (!window.Vue || !window.TDesign) {
+    document.getElementById('app').innerHTML =
+      '<div style="max-width:520px;margin:80px auto;padding:32px;text-align:center;color:#B9AE93;' +
+      'background:#14141A;border:1px solid rgba(212,175,55,.3);line-height:2">' +
+      '<h3 style="color:#D4AF37;margin-bottom:10px">资源加载失败</h3>' +
+      '<p>请确认 libs 目录存在 tdesign 与 vue 文件，或可访问 cdn.jsdelivr.net 后刷新重试。</p></div>';
+    return;
+  }
+
+  var Vue = window.Vue;
+  var TDesign = window.TDesign;
+  var ref = Vue.ref, reactive = Vue.reactive, computed = Vue.computed, watch = Vue.watch;
+  var nextTick = Vue.nextTick, onMounted = Vue.onMounted;
+
+  var SAVE_KEY = 'jianghu-kezhan-save-v1';
+  var CLOUD_PREFIX = 'kezhan-inn-save:';   // 云端存档记录前缀（每掌柜一位）
+  var cloudRev = 0;                        // 云端同步游标
+  var Message = (TDesign && TDesign.MessagePlugin) || {
+    success: function(){}, error: function(){}, info: function(){}, warning: function(){}
+  };
+  function toast(type, msg) {
+    try { Message[type] && Message[type]({ content: msg, placement: 'top' }); } catch (e) { }
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function roll() { return Math.random(); }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  /* ================= 静态内容 ================= */
+
+  var GUESTS = [
+    { name: '赶路书生', desc: '背着书箱的书生风尘仆仆，一进门就讨了壶热茶。' },
+    { name: '行脚货郎', desc: '货郎挑着担子，扁担压得吱呀作响。' },
+    { name: '佩剑游侠', desc: '游侠按着剑柄大步进门，风尘满面。' },
+    { name: '白须镖头', desc: '老镖头押完最后一趟镖，想寻个踏实地方歇脚。' },
+    { name: '采药老人', desc: '老人背着药篓，一身草木清香。' },
+    { name: '绣娘', desc: '绣娘抱着包袱赶路，眉眼间尽是疲色。' },
+    { name: '说书先生', desc: '说书先生摇着折扇进门，嗓音沙哑。' },
+    { name: '马贩子', desc: '马贩牵着一匹好马，进门就嚷嚷着要酒。' },
+    { name: '琴师', desc: '琴师背着琴囊，袖口磨得发亮。' },
+    { name: '屠户', desc: '屠户拎着酒葫芦，嗓门极大，震得灯笼直晃。' },
+    { name: '香客', desc: '香客自山下庙里还愿归来，路过此地。' },
+    { name: '游方郎中', desc: '郎中背着药箱，鞋面上沾满泥点。' }
+  ];
+
+  /* 普通客人 · 第一轮：察言观色 */
+  var TOPICS = [
+    { key: 'jianghu', label: '聊聊江湖见闻', hint: '江湖人最藏不住的，是听到“官府”二字时的神色',
+      say: '你同客人闲话，聊起了近来江湖上的见闻。' },
+    { key: 'shengyi', label: '谈谈买卖行情', hint: '银子的事，一试便知深浅',
+      say: '你顺势同客人谈起了买卖行情。' },
+    { key: 'wenhou', label: '问候行旅辛苦', hint: '寒暄之间，留意他的目光落在何处',
+      say: '你客气地问候客人一路辛苦。' }
+  ];
+  var RESP = {
+    jianghu: {
+      stay: [{ w: 'g', t: '客人打开了话匣子，说起一路见闻，末了还夸你这店收拾得干净。' }],
+      rob: [
+        { w: 'narr', t: '你提起近来官府缉拿江洋大盗的告示，客人端茶的手，停了一停。' },
+        { w: 'g', t: '“这世道，官逼民反，怪不得旁人。”他笑了笑，目光却没有落在你身上。' }
+      ],
+      rich: [
+        { w: 'narr', t: '客人对刀光剑影兴致缺缺。' },
+        { w: 'g', t: '“行走江湖，不如账上有钱。”他掸了掸衣袖，“掌柜的，你这铺子，可做长久买卖？”' }
+      ]
+    },
+    shengyi: {
+      stay: [{ w: 'narr', t: '客人只关心房钱几何，说次日还要赶路，一早便走。' }],
+      rob: [
+        { w: 'g', t: '“江湖人，不过问钱财。”他干笑两声。' },
+        { w: 'narr', t: '可你分明看见，他的目光在钱柜上转了一圈。' }
+      ],
+      rich: [
+        { w: 'narr', t: '他袖口露出半块羊脂玉佩，谈起南北货价如数家珍。' },
+        { w: 'g', t: '“说起来——我这趟出门，正是要办一件喜事。”' }
+      ]
+    },
+    wenhou: {
+      stay: [{ w: 'g', t: '“赶了三天路，总算有个落脚的地方。”客人连声道谢，“掌柜的，添麻烦了。”' }],
+      rob: [
+        { w: 'narr', t: '客人客气地道了乏。' },
+        { w: 'narr', t: '可你总觉得，他的目光越过你的肩头，落在了后堂的方向。' }
+      ],
+      rich: [{ w: 'g', t: '“走惯了，不辛苦。”他摆摆手，“只是天色晚了，想寻个清净地方，摆一桌好酒。”' }]
+    }
+  };
+
+  /* 普通客人 · 第二轮：决定 */
+  var ACTIONS = [
+    { key: 'jiedai', label: '正常接待', hint: '安排客房。住店一晚收入五十文，富贵客人或许另有排场',
+      say: '你招呼小二收拾出一间干净客房。' },
+    { key: 'baoguan', label: '让小二悄悄去报官', hint: '若来者真是劫匪，差役及时赶到可减少损失（七成把握）；若是错认，客人必拂袖而去',
+      say: '你使了个眼色，小二揣好银钱，悄悄从侧门溜了出去。' },
+    { key: 'youshuo', label: '极力游说客人摆宴', hint: '说动客人包下大堂摆宴可获三百文（七成把握）；若对方是劫匪，恐引狼入室',
+      say: '你把店里陈年的花雕夸出了花，极力劝客人摆一桌宴席。' }
+  ];
+
+  /* ================= 神秘客卿剧本 ================= */
+
+  var SPECIALS = {
+    yiyedao: {
+      name: '提刀女子',
+      desc: '长发及膝，手提一柄弯刀，眉眼冷得像三月霜。',
+      intro: [
+        { w: 'narr', t: '暮色四合，一名女子推门而入。长发及膝，手提弯刀，一身的霜雪气。' },
+        { w: 'g', t: '“一间房。”她放下一块碎银，“靠后门。”' },
+        { w: 'narr', t: '你注意到，她入座的位置，正对着门，也对着门外官府贴的告示。' }
+      ],
+      probes: [
+        [
+          { label: '不多过问，只添一壶热茶', hint: '开店的人，讲究一个眼观六路',
+            say: '你不多过问，只让小二添了壶热茶。',
+            lines: [
+              { w: 'g', t: '……多谢。' },
+              { w: 'narr', t: '她似乎有些意外，捧着茶盏的手指缓和了几分。' }
+            ] },
+          { label: '赞一句：好刀', hint: '刀客最听不得别人议论她的刀——也最听得进',
+            say: '你望向她手中的弯刀：“好刀。”',
+            lines: [
+              { w: 'g', t: '“刀是凶器，说不上好。”她按着刀柄，顿了顿，“不过，它砍过的，都是该砍之人。”' }
+            ], inv: 1 },
+          { label: '试探打听她的来历', hint: '江湖险恶，多问多风险',
+            say: '你状似随意地，打听起她的来历。',
+            lines: [
+              { w: 'g', t: '“问路可以。问来历——”她抬眼看你，“会死人的。”' }
+            ], inv: 1 }
+        ],
+        [
+          { label: '聊起近日江湖传闻', hint: '近来官府的告示，贴得有些勤',
+            say: '你提起近日的江湖传闻。',
+            lines: [
+              { w: 'narr', t: '你说起官府又贴了新告示，悬赏一名使刀的女客。她的睫毛都没动一下。' },
+              { w: 'g', t: '“哦。”' },
+              { w: 'narr', t: '烛火跳了跳。她杯中的茶凉透了，也没喝一口。' }
+            ], inv: 1 },
+          { label: '问她夜里可要添个火盆', hint: '客卿冷，屋子也冷',
+            say: '你问她夜里可要添个火盆。',
+            lines: [
+              { w: 'g', t: '“不必。冷惯了。”' }
+            ] },
+          { label: '问她赶夜路可遇过劫道', hint: '说来讽刺——开店的问人劫道',
+            say: '你随口问她，赶夜路可曾遇过劫道的。',
+            lines: [
+              { w: 'g', t: '“劫道的见了我，”她淡淡道，“都改行了。”' }
+            ] }
+        ],
+        [
+          { label: '问她为何总望向官府告示的方向', hint: '她的目光，一直落在门外那张纸上',
+            say: '你顺着她的目光望向门外——那里贴着官府的告示。',
+            lines: [
+              { w: 'g', t: '她收回目光：“在看看，那狗官的名字，排到了第几张纸上。”' }
+            ], inv: 1 },
+          { label: '亲手给她端一碗热汤面', hint: '再冷的刀客，也是要吃饭的',
+            say: '你亲手给她端了一碗热汤面。',
+            lines: [
+              { w: 'g', t: '她吃得很慢，很认真。末了道：“你们开店的人，倒不嫌我这煞星晦气。”' },
+              { w: 'narr', t: '你笑着摆手。她的眉眼，似乎松动了一瞬。' }
+            ], inv: 1 },
+          { label: '催她早些歇息，好腾出人手', hint: '生意人终究要先顾生意',
+            say: '你催她早些歇息。',
+            lines: [
+              { w: 'g', t: '“……好。”' }
+            ] }
+        ],
+        [
+          { label: '轻声问一句：那一刀，值得吗', hint: '收碗筷时，你终于还是问了',
+            say: '收拾碗筷时，你轻声问了一句：“那一刀……值得吗？”',
+            lines: [
+              { w: 'narr', t: '她沉默了很久，久到你以为她不会答了。' },
+              { w: 'g', t: '“三十七条人命，一炷香的功夫。”她望着烛火，“你说呢。”' }
+            ], inv: 2 },
+          { label: '问她接下来去往何处', hint: '天涯路远，总要有个去处',
+            say: '你问她接下来去往何处。',
+            lines: [
+              { w: 'g', t: '“哪都行。”她背起行囊，“天大地大，总有容身之处——也许，没有。”' }
+            ] },
+          { label: '不多话，替她留着后门的灯', hint: '有些话，不必说出口',
+            say: '你没再多话，只替她留着后门的一盏灯。',
+            lines: [
+              { w: 'narr', t: '临睡前，你瞥见她站在那盏灯下，看了很久很久。' }
+            ], inv: 1 }
+        ]
+      ]
+    },
+
+    feishuang: {
+      name: '白发女子',
+      desc: '通身黑白两色，白发白眉，背着一只旧木匣。',
+      intro: [
+        { w: 'narr', t: '入夜，檐外落了雪。一名女子推门进来——白发，白眉，通身黑白两色，像一页没写完的祭文。' },
+        { w: 'g', t: '“一壶浊酒。”她的声音很轻，“要最便宜的。”' },
+        { w: 'narr', t: '她在最角落的位置坐下，背上斜着一只旧木匣，一动不动，像一尊蒙尘的玉像。' }
+      ],
+      probes: [
+        [
+          { label: '迎上去关切招呼：风雪天赶路辛苦', hint: '她那身风霜，不像是赶了半日的路',
+            say: '你迎上去，关切地问：“这般风雪，姑娘从何处赶来？”',
+            lines: [
+              { w: 'g', t: '她握杯的手一顿：“……无处可来。”' },
+              { w: 'narr', t: '她的声音很轻，像怕惊动了什么。' }
+            ], det: 1 },
+          { label: '不多打扰，安静地替她斟酒', hint: '开店的人，懂得什么时候闭嘴',
+            say: '你没有多话，只是安静地替她斟满了酒。',
+            lines: [
+              { w: 'narr', t: '她自斟自饮，目光空落落地望着门外的雪。' }
+            ] },
+          { label: '赞她白发白眉，英气逼人', hint: '这一头白发，是天生的',
+            say: '你由衷赞道：“姑娘白发白眉，好生英气。”',
+            lines: [
+              { w: 'g', t: '“生来如此。”她扯了扯嘴角，“被人当妖怪看了二十年。掌柜的，倒是会说话。”' }
+            ] }
+        ],
+        [
+          { label: '留意她袖口的旧伤，柔声相问', hint: '新旧交叠的伤痕，不会说谎',
+            say: '你留意到她袖口露出几道新旧伤痕，柔声问了一句。',
+            lines: [
+              { w: 'g', t: '她把袖子缓缓放了下来：“吃饭的手艺，不提也罢。”' }
+            ], det: 1 },
+          { label: '同她聊些江湖趣闻', hint: '说说别人的故事，听听她的反应',
+            say: '你试着同她聊些江湖上的趣闻。',
+            lines: [
+              { w: 'g', t: '“江湖。”她笑了笑，眼神却像隔着一层雾，“呵。”' }
+            ] },
+          { label: '添一碟热菜，说是灶上多做的', hint: '深夜的孤客，多半饿着',
+            say: '你添了碟热菜，说是灶上不小心多做的。',
+            lines: [
+              { w: 'g', t: '“……多谢。”她握着杯子的手，紧了紧。' }
+            ], det: 1 }
+        ],
+        [
+          { label: '叹一句：江湖人漂泊，苦', hint: '一句话，说进人心里',
+            say: '你收着碗筷，叹了一句：“江湖人四处漂泊，苦啊。”',
+            lines: [
+              { w: 'narr', t: '她猛地抬起头，眼底有雪光一闪。' },
+              { w: 'g', t: '“……掌柜的，你说，人活着，图什么？”' }
+            ], det: 1 },
+          { label: '问她匣中装的是什么', hint: '那只木匣被她护得很紧',
+            say: '你有些好奇她那只旧木匣。',
+            lines: [
+              { w: 'g', t: '“暗器。”她拍了拍匣子，“吃饭的家伙。”' }
+            ] },
+          { label: '自顾自算账，不多话', hint: '店里还有账要盘',
+            say: '你自顾自拨着算盘，没再多话。',
+            lines: [
+              { w: 'narr', t: '算珠声里，她又饮尽了一杯。' }
+            ] }
+        ],
+        [
+          { label: '她说想上后山看雪——悄悄跟上', hint: '这个时辰，看雪的不多',
+            say: '她起身说要上后山看看雪。你放心不下，远远跟了上去。',
+            lines: [
+              { w: 'narr', t: '后山崖边，她卸下木匣，望着崖底出了神。你出声叫住她时，她怔了很久。' },
+              { w: 'g', t: '“……我累了。”她背对着你，“白道黑道的活都接，接了十一年。没家，没去处。我想着，找个体面的地方，就算了。”' }
+            ], det: 2 },
+          { label: '她说想上后山看雪——由她去', hint: '客人自便，店家不便多问',
+            say: '她说想上后山看看雪。你应了声，由她去。',
+            lines: [
+              { w: 'narr', t: '她在后山待了很久。回来时，肩头落满了雪，像顶了一头白霜。' }
+            ] },
+          { label: '邀她挪到柜台边坐，离火盆近些', hint: '夜深了，火盆边暖和',
+            say: '你邀她挪到柜台边坐，离火盆近些。',
+            lines: [
+              { w: 'g', t: '“……好。”她抱着酒壶挪了过来，难得离人这么近。' }
+            ], det: 1 }
+        ]
+      ]
+    },
+
+    xuanding: {
+      name: '行脚僧·玄定',
+      desc: '灰布僧袍，芒鞋结霜，面上隐有刺字旧痕。',
+      intro: [
+        { w: 'narr', t: '一位僧人踏雪而来，自称玄定。灰布僧袍，芒鞋结霜，眉目低垂。' },
+        { w: 'g', t: '“施主。”他合十，“化一顿素斋。”' },
+        { w: 'narr', t: '你替他布斋时瞧见，他面上隐有刺字旧痕——那规制，绝非寻常黥刑。' }
+      ],
+      probes: [
+        [
+          { label: '奉上素斋，同他聊些佛法', hint: '出家人，先从佛说起',
+            say: '你奉上素斋，同他聊了几句佛法。',
+            lines: [
+              { w: 'g', t: '“施主有礼。”他合十，“心中有佛，处处是庙。”' }
+            ] },
+          { label: '忍不住多看他脸上的刺字几眼', hint: '那刺痕的规制，不寻常',
+            say: '你忍不住，多看了几眼他脸上的刺字。',
+            lines: [
+              { w: 'g', t: '他垂下头去：“少年时的业障，不敢提。”' },
+              { w: 'narr', t: '可你瞧得分明——那刺痕的规制，绝非寻常黥刑所有。' }
+            ], inv: 1 },
+          { label: '问他从哪座宝刹来', hint: '行脚僧，也该有个来处',
+            say: '你问他从哪座宝刹挂单而来。',
+            lines: [
+              { w: 'g', t: '“行脚僧人，四海为家。”' }
+            ] }
+        ],
+        [
+          { label: '聊起天下大势、朝廷新闻', hint: '出家人不该关心朝堂——除非他关心',
+            say: '你聊起天下大势、朝廷新闻。',
+            lines: [
+              { w: 'narr', t: '他捻珠的手，停了一停。' },
+              { w: 'g', t: '“兴，百姓苦；亡，百姓苦。”他垂目，“出家人，不问朝堂。”' }
+            ], inv: 1 },
+          { label: '聊些庄稼收成、邻里琐事', hint: '僧人也食人间烟火',
+            say: '你同他聊些庄稼收成、邻里琐事。',
+            lines: [
+              { w: 'g', t: '“今年雪足，来年必是丰年。”他的语气，难得松快了些。' }
+            ] },
+          { label: '见他衣衫单薄，赠他一件旧棉袍', hint: '雪夜赶路的僧人，衣衫太薄了',
+            say: '你见他衣衫单薄，翻出件旧棉袍赠他。',
+            lines: [
+              { w: 'g', t: '“多谢施主。”' },
+              { w: 'narr', t: '他接衣的手极稳，虎口却有厚茧——不像一双常诵经的手。' }
+            ] }
+        ],
+        [
+          { label: '轻声问：师父面上的字，究竟什么来历', hint: '有些门，推开就关不上了',
+            say: '你斟茶时，轻声问：“师父面上那字……究竟是什么来历？”',
+            lines: [
+              { w: 'g', t: '他抬起头，目光如古井：“施主当真要看？——那，不是寻常黥刑。”' }
+            ], inv: 1 },
+          { label: '问他一路化缘的见闻', hint: '且听他云游四方的故事',
+            say: '你问他一路化缘的见闻。',
+            lines: [
+              { w: 'g', t: '“人间疾苦，处处相仿。”' }
+            ] },
+          { label: '赞他佛法精深，颇有高僧气象', hint: '僧人听到这话，会如何作答',
+            say: '你赞他佛法精深，颇有高僧气象。',
+            lines: [
+              { w: 'g', t: '“过誉。”他摇头，“贫僧诵经，只为赎罪。”' }
+            ] }
+        ],
+        [
+          { key: 'listen', label: '夜里听他在房中诵经，驻足倾听', hint: '那经文，似乎不是寻常经文',
+            say: '夜深，你听见他房中传来诵经声，忍不住驻足倾听。',
+            lines: [
+              { w: 'narr', t: '经声低哑缠绵，像是忏悔，又像是安魂……听不真切。' }
+            ] },
+          { label: '早早歇下，不多打扰', hint: '出家人清修，店家不便多扰',
+            say: '你早早歇下，未再多想。',
+            lines: [
+              { w: 'narr', t: '一夜无事。' }
+            ] },
+          { label: '同他探讨：何为放下', hint: '僧人的功课，也是俗人的功课',
+            say: '你向他请教：“师父，何为放下？”',
+            lines: [
+              { w: 'g', t: '“放不下的，便背着走。”他叹息，“背着背着……就轻了。”' }
+            ] }
+        ]
+      ]
+    }
+  };
+
+  var ENDINGS = {
+    e1: {
+      no: '其一', title: '皆是因果',
+      text: '你将八百文赏钱收进钱柜时，手是稳的。\n\n第七日夜里打烊时分，一位侠客踏月而来，按剑立于堂中。他说：“一叶刀杀的是祸害一方的狗官。你杀的，是收留过你的人的良心。”\n\n刀光落下时，你想起她说过——这份情，一叶刀记下了。\n只是你没想到，记着这份情的，从来不止她一人。'
+    },
+    e2: {
+      no: '其二', title: '蜉蝣天地',
+      text: '次日清晨，伙计在后山崖下发现了她。她怀里抱着那只旧木匣，神色安详，像只是睡着了。\n\n匣中有张字条，墨迹未干，只有四个字——蜉蝣天地。\n\n你把她葬在向阳的坡上，没有立碑。然后你摘下招牌，钉上“歇业”的木牌，再没打开过。\n\n江湖上少了一个用暗器的白发女子。\n这世上，少了一家客栈。'
+    },
+    e3: {
+      no: '其三', title: '古来君王',
+      text: '两日后，城中锣鼓喧天——那位“玄定”法师起兵清君侧，谋反已成，登基大宝。\n\n你还没来得及替他高兴，一队禁军已踏碎客栈门槛。为首的太监尖着嗓子宣旨：“陛下出家旧事，知晓者——灭口。”\n\n你终于明白，他为何要听你一句话。\n龙椅上的人，容不下秘密，也容不下帮过他的人。\n\n古来君王，可以共患难，不可共秘密。'
+    },
+    e4: {
+      no: '其四', title: '你破产了！',
+      text: '钱柜见了底，债主踏破了门槛。\n\n你变卖了桌椅被褥，最后连那块招牌也抵了出去。\n\n江湖路远，从此再无你这家客栈。'
+    }
+  };
+
+  /* ================= 应用状态 ================= */
+
+  function freshState() {
+    return {
+      screen: 'intro', name: '', gender: '男',
+      money: 300, health: 100, fame: 0, income: 0,
+      served: 0, achieved: false, achShown: false,
+      flags: { stay: false, train: false, beads: false },
+      met: { yiyedao: false, feishuang: false, xuanding: false },
+      pend: [], trainCnt: 0,
+      logs: [], enc: null, evt: null, ending: '', _savedAt: 0
+    };
+  }
+
+  var app = Vue.createApp({
+    setup: function () {
+      var S = reactive(freshState());
+      var form = reactive({ name: '', gender: '男' });
+      var helpVisible = ref(false);
+      var chatBox = ref(null);
+      var starting = ref(false);               // 开局时查询云端进度中
+
+      /* 浮金尘埃（非响应式常量） */
+      var motes = [];
+      for (var mi = 0; mi < 14; mi++) {
+        motes.push({
+          i: mi,
+          left: Math.round(Math.random() * 100),
+          s: 2 + Math.round(Math.random() * 3),
+          d: 14 + Math.round(Math.random() * 16),
+          delay: -Math.round(Math.random() * 26)
+        });
+      }
+
+      /* ---------- 存档 ---------- */
+      function save() {
+        if (S.screen !== 'game') return;
+        S._savedAt = Date.now();
+        try {
+          var data = JSON.parse(JSON.stringify(S));
+          if (data.logs && data.logs.length > 60) data.logs = data.logs.slice(-60);
+          localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+        } catch (e) { }
+        cloudPush();
+      }
+
+      /* ---------- 云端存档同步（每掌柜独立存档位，仅同步自己的进度） ---------- */
+      function cloudBase() {
+        return (location.origin && /^https?:/.test(location.origin) &&
+                !/^https?:\/\/(localhost|127\.0\.0\.1)(:|$)/.test(location.origin))
+               ? location.origin : '';
+      }
+
+      function saveIdOf(n) {
+        return CLOUD_PREFIX + encodeURIComponent(String(n || '').trim().toLowerCase());
+      }
+
+      function cloudSend(changes) {
+        var base = cloudBase();
+        if (!base) return;
+        try {
+          fetch(base + '/api/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client: 'kezhan', since: 0, changes: changes })
+          }).catch(function () { });
+        } catch (e) { }
+      }
+
+      function cloudPush() {
+        if (S.screen !== 'game' || !S.name) return;
+        var data = JSON.parse(JSON.stringify(S));
+        if (data.logs && data.logs.length > 60) data.logs = data.logs.slice(-60);
+        cloudSend([{ id: saveIdOf(S.name), data: data }]);
+      }
+
+      /** 只拉取某个存档位（服务端按前缀过滤，别人的数据不会传到这里） */
+      function fetchCloud(id) {
+        var base = cloudBase();
+        if (!base) return Promise.resolve(null);
+        return fetch(base + '/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ client: 'kezhan', since: 0, changes: [], prefix: id })
+        }).then(function (r) { return r.json(); }).then(function (res) {
+          if (!res || !res.ok) return null;
+          var rec = null;
+          (res.list || []).forEach(function (x) {
+            if (x.id === id && !x.deleted) rec = x;
+          });
+          return rec;
+        }).catch(function () { return null; });
+      }
+      function restore() {
+        try {
+          var d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+          if (d && d.screen === 'game') {
+            var f = freshState();
+            Object.keys(f).forEach(function (k) { if (k in d) S[k] = d[k]; });
+            return true;
+          }
+        } catch (e) { }
+        return false;
+      }
+
+      /* ---------- 日志 ---------- */
+      function logEvent(t, tone) {
+        S.logs.push({ id: uid(), t: t, tone: tone || '' });
+        if (S.logs.length > 200) S.logs = S.logs.slice(-120);
+      }
+
+      /* ---------- 钱财 ---------- */
+      function gain(n) {
+        S.money += n; S.income += n;
+        if (S.income >= 10000 && !S.achieved) {
+          S.achieved = true; S.achShown = true; S.fame += 50;
+        }
+      }
+      function lose(n) {
+        S.money = Math.max(0, S.money - n);
+      }
+      function hurt(n) { S.health = Math.max(1, S.health - n); }
+
+      /* ---------- 开局 ---------- */
+      function beginNew(n) {
+        S.name = n; S.gender = form.gender;
+        S.screen = 'game';
+        logEvent('「' + n + '」' + (form.gender === '男' ? '掌柜' : '老板娘') + '接下这间客栈，黑金招牌，连夜挂起。');
+        toast('success', '客栈开张，恭迎四方来客');
+        starting.value = false;
+        save();
+      }
+      function startGame() {
+        if (starting.value) return;
+        var n = (form.name || '').trim();
+        if (!n) { toast('warning', '请先报上掌柜名号'); return; }
+        starting.value = true;
+        if (!cloudBase()) { beginNew(n); return; }
+        /* 只查询该名号自己的云端存档——别人的数据不会经过这里 */
+        fetchCloud(saveIdOf(n)).then(function (rec) {
+          if (rec && rec.data && rec.data.screen === 'game') {
+            var f = freshState();
+            Object.keys(f).forEach(function (k) { if (k in rec.data) S[k] = rec.data[k]; });
+            S.screen = 'game';
+            S.name = rec.data.name || n;
+            try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { }
+            starting.value = false;
+            toast('success', '欢迎回来，' + S.name + '——已接续云端进度（第 ' + (S.served + 1) + ' 位客人）');
+          } else {
+            beginNew(n);
+          }
+        });
+      }
+      function restart() {
+        try { localStorage.removeItem(SAVE_KEY); } catch (e) { }
+        var f = freshState();
+        Object.keys(f).forEach(function (k) { S[k] = f[k]; });
+        form.name = ''; form.gender = '男';
+        starting.value = false;
+        toast('info', '已回到迎客门——输入同名号可随时接续旧进度');
+      }
+
+      /* ---------- 迎客 ---------- */
+      function rollType() {
+        var rob = S.flags.beads ? 0 : 0.25;
+        var rich = 0.20 + (S.flags.train ? 0.15 : 0) - (S.flags.beads ? 0.05 : 0);
+        var r = roll();
+        if (r < rob) return 'rob';
+        if (r < rob + rich) return 'rich';
+        return 'stay';
+      }
+
+      function nextCustomer() {
+        if (S.enc) return;
+        var idx = S.served + 1;
+        var unmet = ['yiyedao', 'feishuang', 'xuanding'].filter(function (k) { return !S.met[k]; });
+        if (idx % 3 === 0 && unmet.length) {
+          var id = pick(unmet);
+          S.met[id] = true;
+          var sp = SPECIALS[id];
+          S.enc = {
+            kind: 'sp', id: id, name: sp.name, desc: sp.desc,
+            step: 0, inv: 0, det: 0, storyHeard: false, decis: null, log: sp.intro.slice()
+          };
+          logEvent('一位不寻常的客人，踏进了店门。');
+        } else {
+          var g = pick(GUESTS);
+          S.enc = {
+            kind: 'nm', hidden: rollType(), name: g.name, desc: g.desc,
+            step: 0, log: [{ w: 'narr', t: '店门吱呀一响。' + g.desc }]
+          };
+        }
+        save();
+      }
+
+      function pushLog(lines) {
+        var e = S.enc; if (!e) return;
+        lines.forEach(function (l) { e.log.push({ w: l.w, t: l.t, bad: !!l.bad }); });
+        nextTick(function () {
+          var el = chatBox.value;
+          if (el) el.scrollTop = el.scrollHeight;
+        });
+      }
+
+      /* ---------- 普通客人 ---------- */
+      var nmOptions = computed(function () {
+        var e = S.enc;
+        if (!e || e.kind !== 'nm') return null;
+        return e.step === 0 ? TOPICS : (e.step === 1 ? ACTIONS : null);
+      });
+
+      function chooseNm(o) {
+        var e = S.enc;
+        if (!e || e.kind !== 'nm' || e.step > 1) return;
+        pushLog([{ w: 'y', t: o.say }]);
+        if (e.step === 0) {
+          RESP[o.key][e.hidden].forEach(function (l) { e.log.push(l); });
+          e.step = 1;
+          nextTick(function () {
+            var el = chatBox.value;
+            if (el) el.scrollTop = el.scrollHeight;
+          });
+        } else {
+          resolveNormal(o.key);
+        }
+        save();
+      }
+
+      function sysLog(t, bad) { pushLog([{ w: 'sys', t: t, bad: !!bad }]); }
+
+      function resolveNormal(key) {
+        var e = S.enc;
+        var h = e.hidden;
+        e.step = 2;
+
+        if (key === 'jiedai') {
+          if (h === 'stay') {
+            sysLog('客人歇了一晚，天明结账——柜上多了五十文。（银钱 +50）');
+            gain(50);
+          } else if (h === 'rich') {
+            var pb = S.flags.beads ? 0.15 : (S.flags.train ? 0.7 : 0.5);
+            if (roll() < pb) {
+              sysLog('豪客大手一挥包下大堂：“今夜设宴，好酒好菜尽管上！”宴罢结账，柜上多了三百文。（银钱 +300）');
+              gain(300); S.fame += 3;
+              logEvent('店里摆了一场大宴，宾主尽欢。', 'good');
+            } else {
+              sysLog('客人要了间上房，歇了一晚，付了五十文。（银钱 +50）');
+              gain(50);
+            }
+          } else { /* rob */
+            if (S.flags.stay) {
+              sysLog('夜半，那“客人”摸向钱柜时，窗棂上“叮”的一声——一枚银针钉住了他的衣角。他吓得面如土色，天不亮就结账跑了，还多留了五十文压惊。（银钱 +50）');
+              gain(50);
+              logEvent('一场打劫，被柜后的白发女子悄然化解。', 'good');
+            } else {
+              sysLog('夜半三更，那人翻脸拔刀，抢走了柜上两百文，还动了粗！你受了些皮肉伤。（银钱 -200 · 体质 -15）', true);
+              lose(200); hurt(15);
+              logEvent('店里遭了劫，损失两百文。', 'bad');
+            }
+          }
+        } else if (key === 'baoguan') {
+          if (h === 'rob') {
+            if (roll() < 0.7) {
+              sysLog('小二领着差役及时赶到，劫匪只来得及抢走柜上零钱八十文，仓皇跳窗而逃。（银钱 -80 · 体质 -5）');
+              lose(80); hurt(5);
+              logEvent('报官及时，损失减至八十文。');
+            } else {
+              sysLog('差役来迟一步，劫匪已卷走两百文远遁，你还挨了一刀。（银钱 -200 · 体质 -15）', true);
+              lose(200); hurt(15);
+              logEvent('报官来迟，仍被抢走两百文。', 'bad');
+            }
+          } else {
+            sysLog('官差上门盘查半晌，查无实据，客人拂袖而去。此事传开，街坊都说你这店不近人情。（声名 -5）', true);
+            S.fame = Math.max(0, S.fame - 5);
+            logEvent('报了个空，客人愤然离去，声名受损。', 'bad');
+          }
+        } else { /* youshuo */
+          if (h === 'rob') {
+            sysLog('你殷勤劝酒，那“客人”却趁着席间人多手杂，摸进后堂卷走了两百文！（银钱 -200 · 体质 -15）', true);
+            lose(200); hurt(15);
+            logEvent('引狼入室，宴没摆成，反失两百文。', 'bad');
+          } else {
+            var pl = S.flags.beads ? 0.35 : (S.flags.train ? 0.85 : 0.7);
+            if (roll() < pl) {
+              sysLog('客人被你一番巧舌说动，当场包下大堂：“好！今夜就摆它一桌！”宴罢结账，柜上多了三百文。（银钱 +300）');
+              gain(300); S.fame += 3;
+              logEvent('你劝成了一场宴席，进账三百文。', 'good');
+            } else {
+              sysLog('客人听得直摆手，最后只要了间客房，付了五十文。（银钱 +50）');
+              gain(50);
+            }
+          }
+        }
+
+        finishEncounter();
+      }
+
+      /* ---------- 神秘客卿 ---------- */
+      var talkStep = computed(function () {
+        var e = S.enc;
+        if (!e || e.kind !== 'sp') return 0;
+        return Math.min(e.step + 1, 5);
+      });
+
+      var spOptions = computed(function () {
+        var e = S.enc;
+        if (!e || e.kind !== 'sp') return null;
+        if (e.step < 4) return SPECIALS[e.id].probes[e.step];
+        if (e.step === 4) return e.decis;
+        return null;
+      });
+
+      function chooseSp(o) {
+        var e = S.enc;
+        if (!e || e.kind !== 'sp') return;
+        if (o.say) pushLog([{ w: 'y', t: o.say }]);
+        if (e.step < 4) {
+          o.lines.forEach(function (l) { e.log.push(l); });
+          if (o.inv) e.inv += o.inv;
+          if (o.det) e.det += o.det;
+          /* 玄定：夜听诵经，依此前积累决定是否听闻全貌 */
+          if (e.id === 'xuanding' && e.step === 3 && o.key === 'listen') {
+            if (e.inv >= 3) {
+              e.storyHeard = true;
+              pushLog([
+                { w: 'narr', t: '——且慢。他诵的经文里，竟有超度帝王的段落。你推门进去，他睁眼看你，看了很久。' },
+                { w: 'g', t: '“施主既已听见……”他自嘲一笑，“我俗家姓李。本是能争一争那把椅子的皇子。遭人构陷下了天牢，是母族拼死将我捞出。为保命，只能剃度。”' },
+                { w: 'narr', t: '他的故事讲完了。佛灯将尽，天快亮了。' }
+              ]);
+            } else {
+              pushLog([{ w: 'narr', t: '经声低哑，听不真切，你听了半晌，只觉夜风更凉了。' }]);
+            }
+          }
+          e.step++;
+          if (e.step === 4) buildDecisive(e);
+        } else if (e.step === 4) {
+          applyDecisive(o);
+        }
+        save();
+      }
+
+      function buildDecisive(e) {
+        if (e.id === 'yiyedao') {
+          if (e.inv >= 3) {
+            e.storyHeard = true;
+            pushLog([
+              { w: 'narr', t: '后半夜，她忽然在你柜台前坐下，将故事从头说了一遍——' },
+              { w: 'g', t: '“我杀的，是逼死三十七条人命的狗官。悬赏八百文，一路杀到你们这地界。”她看着你，“官府的人，明早就会挨家搜查。”' },
+              { w: 'narr', t: '她的故事讲完了。烛火将熄，天快亮了。' }
+            ]);
+            e.decis = [
+              { key: 'help', label: '备好快马与干粮，天亮前从后门送她走', hint: '放走钦犯，或有一份口头承诺' },
+              { key: 'sell', label: '稳住她——去官府领那八百文赏钱', hint: '听完了故事再出卖……因果自负', danger: true }
+            ];
+          } else {
+            pushLog([
+              { w: 'narr', t: '她始终没再多说一个字。天将明，她结清房钱，提刀立在门前，回头看了你一眼。' }
+            ]);
+            e.decis = [
+              { key: 'pass', label: '送她离开', hint: '江湖路远，后会无期' },
+              { key: 'sell', label: '稳住她——去官府领那八百文赏钱', hint: '来历不明之人，交给官府处置', danger: true }
+            ];
+          }
+        } else if (e.id === 'feishuang') {
+          if (e.det >= 3) {
+            pushLog([
+              { w: 'narr', t: '夜半，她付了酒钱，起身朝门外走。你忽然明白过来——' },
+              { w: 'narr', t: '她方才在后山看的不是雪，是崖底。今夜过后，江湖上也许就再没有这个白发白眉的姑娘了。' }
+            ]);
+            e.decis = [
+              { key: 'stay', label: '留住她——店里正缺个坐镇的能手，管吃管住', hint: '此后所有打劫之事，必被她阻止' },
+              { key: 'train', label: '请她收留流落街头的孩子，传一门安身的手艺', hint: '得她珍藏暗器，客栈声名大噪，且常有钱银寄来' }
+            ];
+          } else {
+            pushLog([
+              { w: 'narr', t: '夜深了。她结了酒钱，起身走进风雪里，那抹白色很快便看不见了。' },
+              { w: 'narr', t: '你说不上来哪里不对，只当是自己多心了。' }
+            ]);
+            e.decis = [
+              { key: 'leave', label: '目送她离开', hint: '……真的，只是目送吗？' }
+            ];
+          }
+        } else { /* xuanding */
+          if (e.storyHeard) {
+            pushLog([
+              { w: 'narr', t: '天明，玄定收拾行囊，在门口驻足，回头看你。' },
+              { w: 'g', t: '“施主是明白人。此后之事，贫僧……想听施主一句。”' }
+            ]);
+            e.decis = [
+              { key: 'urge', label: '撺掇他：本就是您的东西，何不拿回来', hint: '龙椅之上，血雨腥风', danger: true },
+              { key: 'persuade', label: '劝他：执念放下，方得自在', hint: '佛珠一串，还你一世清净' }
+            ];
+          } else {
+            pushLog([
+              { w: 'narr', t: '玄定用完斋饭，合十告辞，消失在官道尽头的晨雾里。' },
+              { w: 'narr', t: '此后，再无音讯。' }
+            ]);
+            e.decis = [
+              { key: 'farewell', label: '目送他离去', hint: '行脚僧人，四海为家' }
+            ];
+          }
+        }
+      }
+
+      function applyDecisive(o) {
+        var e = S.enc;
+        e.step = 5;
+
+        if (e.id === 'yiyedao') {
+          if (o.key === 'help') {
+            pushLog([
+              { w: 'narr', t: '你牵来后院最快的马，干粮和盘缠塞进鞍袋，替她打开了后门。' },
+              { w: 'g', t: '她翻身上马，深深看了你一眼：“这份情，一叶刀记下了。他日，必报。”' },
+              { w: 'narr', t: '马蹄声消失在晨雾里。街口，官差的脚步声由远及近——扑了个空。' }
+            ]);
+            S.pend.push({ type: 'yiyedao', remain: 3 });
+            logEvent('你帮一叶刀逃过了官府的搜捕。她留下一句承诺。', 'good');
+          } else { /* sell */
+            pushLog([
+              { w: 'narr', t: '官差破门而入时，她没有拔刀，只是静静看了你很久。' },
+              { w: 'g', t: '“好一个……开门做生意的。”' }
+            ]);
+            gain(800);
+            sysLog('官府如数奉上赏钱八百文。（银钱 +800）');
+            logEvent('你出卖了一叶刀，从官府领得八百文赏钱。', 'bad');
+            if (e.storyHeard) { finishEncounter(true); if (S.screen !== 'ending') doEnding('e1'); return; }
+          }
+        } else if (e.id === 'feishuang') {
+          if (o.key === 'stay') {
+            pushLog([
+              { w: 'narr', t: '你抢上一步拦在她身前，把柜台后那把椅子拉了出来——店里正缺个坐镇的。' },
+              { w: 'g', t: '她立在门口，沉默了很久很久，忽然低低笑了一声。' },
+              { w: 'g', t: '“……行。反正，也不急着死了。”' }
+            ]);
+            S.flags.stay = true;
+            sysLog('自此，柜台后多了一位白发女子。宵小之辈望而却步——此后所有打劫，必被她化解。');
+            logEvent('飞霜雪留在了店里。打劫之事，再无可能。', 'good');
+          } else if (o.key === 'train') {
+            pushLog([
+              { w: 'narr', t: '你提起城南那些流落街头、冬天熬不过去的孩子。' },
+              { w: 'g', t: '她挑眉：“你这掌柜，胆子倒大。”顿了顿，“……不过，那些孩子若有个去处，兴许比我强。”' },
+              { w: 'narr', t: '临行前，她把珍藏的一匣暗器留在了你柜上：“压店用。”' }
+            ]);
+            S.flags.train = true; S.fame += 20; S.trainCnt = 0;
+            sysLog('飞霜雪在城南开了间铺子，收留流浪的孩子传艺。江湖传言你这客栈有位了不得的朋友——客栈声名大噪，摆宴的客人也多了。（声名 +20）');
+            logEvent('飞霜雪去培训流落街头的孩子。客栈声名大噪。', 'good');
+          } else { /* leave */
+            pushLog([{ w: 'narr', t: '你目送那抹白色，消失在漫天风雪里。' }]);
+            finishEncounter(true);
+            if (S.screen !== 'ending') doEnding('e2');
+            return;
+          }
+        } else { /* xuanding */
+          if (o.key === 'urge') {
+            pushLog([
+              { w: 'narr', t: '你替他添了盏茶，只说了一句：“本就是您的东西，何不拿回来。”' },
+              { w: 'g', t: '他闭目良久，再睁眼时，眸中已无佛。' },
+              { w: 'g', t: '“佛渡不了我。那便……让我自己渡一回。”' },
+              { w: 'narr', t: '玄定大步走进晨雾，僧袍猎猎。你隐约觉得，自己说了句不该说的话。' }
+            ]);
+            S.pend.push({ type: 'news', remain: 2 });
+            logEvent('你撺掇玄定去夺回本属于他的东西。', 'bad');
+          } else if (o.key === 'persuade') {
+            pushLog([
+              { w: 'narr', t: '你替他理了理行囊，只说了一句：“背着背着就轻了——师父不如，试着放下。”' },
+              { w: 'g', t: '“……施主说得对。”他展颜一笑，眉间刺痕似乎都淡了，“多谢。”' }
+            ]);
+            S.pend.push({ type: 'beads', remain: 2 });
+            logEvent('你劝玄定放下了执念。', 'good');
+          }
+          /* farewell：无后续 */
+        }
+
+        finishEncounter();
+      }
+
+      /* 一叶刀 · 任意时刻直接出卖 */
+      function sellYiyedaoNow() {
+        var e = S.enc;
+        if (!e || e.id !== 'yiyedao') return;
+        pushLog([
+          { w: 'narr', t: '你悄悄差小二从侧门溜出去，直奔县衙——没有多问一个字。' },
+          { w: 'narr', t: '官差破门而入时，她没有拔刀，只是静静看了你很久。' },
+          { w: 'g', t: '“好一个……开门做生意的。”' }
+        ]);
+        gain(800);
+        sysLog('官府如数奉上赏钱八百文。（银钱 +800）');
+        e.step = 5;
+        logEvent('你没听故事，直接出卖了一叶刀，领得八百文。', 'bad');
+        finishEncounter();
+      }
+
+      /* ---------- 结束与结算 ---------- */
+      var encDone = computed(function () {
+        var e = S.enc;
+        if (!e) return false;
+        return e.kind === 'nm' ? e.step >= 2 : e.step >= 5;
+      });
+
+      function seeOff() { S.enc = null; save(); }
+
+      function finishEncounter(skipBankrupt) {
+        S.served++;
+
+        /* 飞霜雪寄钱：每隔两位客人 */
+        if (S.flags.train) {
+          S.trainCnt++;
+          if (S.trainCnt % 2 === 0) {
+            gain(100);
+            logEvent('飞霜雪从城南托人捎来一百文，附言：“铺子顺遂，勿念。”（银钱 +100）', 'good');
+          }
+        }
+
+        /* 延迟事件 */
+        var keep = [];
+        for (var i = 0; i < S.pend.length; i++) {
+          var p = S.pend[i];
+          p.remain--;
+          if (p.remain > 0) { keep.push(p); continue; }
+          if (p.type === 'yiyedao') {
+            gain(800);
+            S.evt = {
+              title: '故人相托',
+              text: '一位风尘仆仆的侠客推门而入，放下一包沉甸甸的银钱：\n\n“一叶刀姑娘托我送来的。她说——承蒙相救，八百文，分文不少。”\n\n（银钱 +800）'
+            };
+            logEvent('一叶刀的朋友如约送来八百文。（银钱 +800）', 'good');
+          } else if (p.type === 'beads') {
+            S.flags.beads = true;
+            S.evt = {
+              title: '玄定的谢礼',
+              text: '一位小沙弥渡水而来，奉上一只木匣，内有一串乌木佛珠，附信一封：\n\n“施主赠我一言，贫僧还施主一世清净。——玄定”\n\n自此，佛珠悬于柜上，满堂清心——再无劫匪光顾，大鱼大肉的宴席也少了许多。'
+            };
+            logEvent('玄定送来一串佛珠，挂在了柜台上方。', 'good');
+          } else if (p.type === 'news') {
+            doEnding('e3');
+            return;
+          }
+        }
+        S.pend = keep;
+
+        if (!skipBankrupt && S.money <= 0) { doEnding('e4'); return; }
+        save();
+      }
+
+      function doEnding(key) {
+        S.ending = key;
+        S.screen = 'ending';
+        S._savedAt = Date.now();
+        try { localStorage.removeItem(SAVE_KEY); } catch (e) { }
+        /* 终局档保存在玩家自己的存档位上，不再接续 */
+        if (S.name) {
+          var data = JSON.parse(JSON.stringify(S));
+          if (data.logs && data.logs.length > 60) data.logs = data.logs.slice(-60);
+          cloudSend([{ id: saveIdOf(S.name), data: data }]);
+        }
+      }
+
+      var ending = computed(function () { return ENDINGS[S.ending] || ENDINGS.e4; });
+      var logsView = computed(function () { return S.logs.slice().reverse(); });
+
+      var evtVisible = computed({
+        get: function () { return !!S.evt; },
+        set: function (v) { if (!v) S.evt = null; }
+      });
+
+      /* ---------- 生命周期 ---------- */
+      onMounted(function () {
+        if (restore()) {
+          toast('info', '已恢复上次的经营进度');
+          /* 只与自己名号下的云端存档核对：云端较新则采用，本地较新则补推 */
+          if (S.name) {
+            fetchCloud(saveIdOf(S.name)).then(function (rec) {
+              if (rec && rec.data && rec.data.screen === 'game' &&
+                  Number(rec.data._savedAt || 0) > Number(S._savedAt || 0)) {
+                var f = freshState();
+                Object.keys(f).forEach(function (k) { if (k in rec.data) S[k] = rec.data[k]; });
+                toast('info', '已同步「' + S.name + '」在云端保存的最新进度');
+              } else if (S.screen === 'game') {
+                cloudPush();
+              }
+            });
+          }
+        }
+      });
+
+      return {
+        S: S, form: form, helpVisible: helpVisible, chatBox: chatBox,
+        motes: motes,
+        nmOptions: nmOptions, spOptions: spOptions, talkStep: talkStep, encDone: encDone,
+        ending: ending, logsView: logsView, evtVisible: evtVisible,
+        starting: starting,
+        startGame: startGame, restart: restart,
+        nextCustomer: nextCustomer, chooseNm: chooseNm, chooseSp: chooseSp,
+        sellYiyedaoNow: sellYiyedaoNow, seeOff: seeOff
+      };
+    }
+  });
+
+  /* 图标组件 */
+  app.component('i-icon', {
+    props: { name: { type: String, required: true } },
+    template: '<svg class="i" aria-hidden="true"><use :href="\'#ic-\' + name"></use></svg>'
+  });
+
+  /* 注册 TDesign */
+  var tdesign = TDesign && TDesign['default'] ? TDesign['default'] : TDesign;
+  var installed = false;
+  try {
+    if (tdesign && typeof tdesign.install === 'function') { app.use(tdesign); installed = true; }
+  } catch (e) { installed = false; }
+  if (!installed) {
+    Object.keys(TDesign).forEach(function (key) {
+      var comp = TDesign[key];
+      var target = comp && comp.default ? comp.default : comp;
+      var name = target && target.name;
+      if (typeof name === 'string' && name.charAt(0) === 'T') {
+        try { app.component(name, target); } catch (e) { }
+      }
+    });
+  }
+
+  app.mount('#app');
+  var root = document.getElementById('app');
+  if (root) root.removeAttribute('v-cloak');
+})();
+</script>
+</body>
+</html>
